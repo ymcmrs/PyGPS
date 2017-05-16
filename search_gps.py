@@ -205,7 +205,7 @@ def main(argv):
         DE = P_Dend[kk[i]]
         
         print '     ' + str(Nm) + '           ' + str(LAT) + '       ' + str(LON) + '       ' + str(DB) + '     ' + str(DE) 
-        call_str = 'echo ' + str(Nm) + ' ' + str(LAT) + ' ' + str(LON)   + ' >> ' + TXT
+        call_str = 'echo ' + str(Nm) + ' ' + str(LAT) + ' ' + str(LON)   +  ' ' + str(DB) + ' ' + str(DE) ' >> ' + TXT
         os.system(call_str)
                
 
