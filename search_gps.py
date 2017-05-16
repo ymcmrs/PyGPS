@@ -193,6 +193,10 @@ def main(argv):
         print ''
         print '  Station Name      Lat(deg)      Long(deg)       Date_beg      Date_end  '
     
+    TXT = 'search_gps.txt'
+    if os.path.isfile(TXT):
+        os.remove(TXT)
+    
     for i in range(x):
         Nm = P_Name[kk[i]]
         LAT = P_Lat[kk[i]]
@@ -201,7 +205,8 @@ def main(argv):
         DE = P_Dend[kk[i]]
         
         print '     ' + str(Nm) + '           ' + str(LAT) + '       ' + str(LON) + '       ' + str(DB) + '     ' + str(DE) 
-        
+        call_str = 'echo ' + Nm + ' >> ' + TXT
+        os.system(call_str)
                
 
 if __name__ == '__main__':
