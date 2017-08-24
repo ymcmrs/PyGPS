@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 ############################################################
-# Program is part of TSSAR v1.0                           #
+# Program is part of PySAR v1.2                            #
 # Copyright(c) 2017, Yunmeng Cao                           #
 # Author:  Yunmeng Cao                                     #
 ############################################################
@@ -11,6 +11,7 @@ import getopt
 import sys
 import os
 import h5py
+import argparse
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MultipleLocator, FormatStrFormatter
 
@@ -26,55 +27,119 @@ def rm(FILE):
     call_str = 'rm ' + FILE
     os.system(call_str)
     
-def usage():
-    print '''
-    ***********************************************************************************
+def UseGamma(inFile, task, keyword):
+    if task == "read":
+        f = open(inFile, "r")
+        while 1:
+            line = f.readline()
+            if not line: break
+            if line.count(keyword) == 1:
+                strtemp = line.split(":")
+                value = strtemp[1].strip()
+                return value
+        print "Keyword " + keyword + " doesn't exist in " + inFile
+        f.close()    
 
+def is_number(s):
+    try:
+        int(s)
+        return True
+    except ValueError:
+        return False
+        
+#######################################################################################
+
+INTRODUCTION = '''
     Searching available GPS stations over the research region.
     
     Global GPS stations are referred the GPSNetMap of Nevada Geodetic Laboratory
     Details can be found from http://geodesy.unr.edu/NGLStationPages/gpsnetmap/GPSNetMap.html
- 
-    Usage:
-   
-        search_gps.py SLC_par
-        search_gps.py timeseries.h5
-        search_gps.py velocity.h5
-        search_gps.py -f SLC_par -s Date1 -e Date2 
 
-    e.g.:
-        
-         search_gps.py /Yunmeng/SCRATCH/PichinchaSMT51TsxD/SLC/20100101.slc.par
-         search_gps.py /Yunmeng/SCRATCH/PichinchaSMT51TsxD/PROCESS/TSH5/timeseries.h5
-         search_gps.py /Yunmeng/SCRATCH/PichinchaSMT51TsxD/PROCESS/TSH5/velocity.h5
-         search_gps.py -f 20100101.slc.par -s 2010-01-01 -e 2015-01-10     
-    ***********************************************************************************
+'''
 
-    '''
+
+EXAMPLE = '''EXAMPLES:
+    search_gps.py -p projectName
+    search_gps.py -t SLCpar -s Date1 -e Date2
+    search_gps.py -p projectName -s Date1 -e Date2
+    
+    search_gps.py -p LosAngelesT64F108S1A
+    search_gps.py -t /Yunmeng/SCRATCH/20100101.slc.par
+    search_gps.py -p LosAngelesT64F108S1A -s 2008-01-01 -e 2010-01-01
+
+'''
+
+
+def cmdLineParse():
+    parser = argparse.ArgumentParser(description='Download GPS data over SAR coverage.',\
+                                     formatter_class=argparse.RawTextHelpFormatter,\
+                                     epilog=INTRODUCTION+'\n'+EXAMPLE)
+
+    parser.add_argument('-p', dest = 'projectName',help='Project name of the processing datasets.')
+    parser.add_argument('-t', dest='SLCpar', help='One SLC par file of the resaerch region.')
+    parser.add_argument('-s', dest='Dbeg', help='Beginning date of available GPS data.')
+    parser.add_argument('-e', dest='Dend', help='Ending date of available GPS data.')
+    
+    inps = parser.parse_args()
+    
+    if not inps.projectName and not inps.SLCpar:
+        parser.print_usage()
+        sys.exit(os.path.basename(sys.argv[0])+': error: projectName and SLCpar File, at least one is needed.')
+    return inps
+
+    return inps
+
+################################################################################################
+
+
 def main(argv):
     
-    FILE = ''
-    Dbeg = ''
-    Dend = ''
-      
-    if len(sys.argv)>2:
-        try:   opts, args = getopt.getopt(argv,"h:f:s:e:")
-        except getopt.GetoptError:
-            usage() ; sys.exit(1)
-  
-        for opt,arg in opts:
-            if opt in ("-h","--help"):  usage();   sys.exit()
-            elif opt == '-f':           FILE  = arg
-            elif opt == '-s':           Dbeg  = arg
-            elif opt == '-e':           Dend  = arg
-  
-    elif len(sys.argv)==2:
-        if os.path.isfile(argv[0]):     FILE = argv[0]
-        else:  usage(); sys.exit(1)
-    else:  usage(); sys.exit(1)
+    inps = cmdLineParse()
+    
+    if inps.projectName:
+        projectName = inps.projectName
+        scratchDir = os.getenv('SCRATCHDIR')
+        templateDir = os.getenv('TEMPLATEDIR')
+        slcDir     = scratchDir + '/' + projectName + "/SLC"
+        #gpsDir     = scratchDir + '/' + projectName + "/PYGPS"
+        ListSLC = os.listdir(slcDir)
+        Datelist = []
+        for kk in range(len(ListSLC)):
+            if ( is_number(ListSLC[kk]) and len(ListSLC[kk])==6 ):    #  if SAR date number is 8, 6 should change to 8.
+                DD=ListSLC[kk]
+                Year=int(DD[0:2])
+                Month = int(DD[2:4])
+                Day = int(DD[4:6])
+                if  ( 0 < Year < 20 and 0 < Month < 13 and 0 < Day < 32 ):            
+                    Datelist.append(ListSLC[kk])
+    
+        map(int,Datelist)                
+        Datelist.sort()
+        map(str,Datelist)
+        SLCpar = slcDir + "/" + Datelist[0] +"/" + Datelist[0] + ".slc.par"
+        print "SLCpar file: %s" % SLCpar
+    else:
+        SLCpar = inps.SLCpar
+        #gpsDir = os.getcwd() + '/PYGPS'
         
-    if not os.path.isfile(FILE):
-        usage(); sys.exit(1)
+    #if not os.path.isdir(gpsDir):
+    #    call_str = 'mkdir ' + gpsDir
+    #    os.system(call_str)
+    
+    #call_str = 'cp ' + SLCpar + ' ' + gpsDir
+    #os.system(call_str)
+    
+    #os.chdir(gpsDir)
+    FILE = SLCpar 
+    
+    TS = UseGamma(FILE,'read','start_time:')
+    TS=str(float(TS.split('s')[0]))
+    
+    INC = UseGamma(FILE,'read','incidence_angle:')
+    INC = str(float(INC.split('degrees')[0]))
+    
+    HEAD = UseGamma(FILE,'read','heading:')
+    HEAD = str(float(HEAD.split('degrees')[0]))
     
     ########################## Get GPS station infomation ##################################
     
@@ -170,10 +235,14 @@ def main(argv):
     date1 = 0
     date2 = 99999999
     
-    if len(Dbeg) > 0:
+    if inps.Dbeg:
+        Dbeg = inps.Dbeg
         date1 = float_yyyymmdd(Dbeg)
-    if len(Dend) > 0:
+        print date1
+    if inps.Dend:
+        Dend = inps.Dend
         date2 = float_yyyymmdd(Dend)
+        print date2
         
     x = len(kk)
     kk_mod = []
@@ -181,7 +250,7 @@ def main(argv):
     for i in range(x):
         dt1 = float_yyyymmdd(P_Dbeg[kk[i]])
         dt2 = float_yyyymmdd(P_Dend[kk[i]])
-        if (dt1 > date1 and dt1 < date2) or (dt2 > date1 and dt2 < date2):
+        if (dt1 > date1 and dt1 < date2) or (dt2 > date1 and dt2 < date2) or ( dt1<date1 and date2 < dt2):
             kk_mod.append(kk[i])
     
     kk = kk_mod
@@ -193,7 +262,8 @@ def main(argv):
         print ''
         print '  Station Name      Lat(deg)      Long(deg)       Date_beg      Date_end  '
     
-    TXT = 'search_gps.txt'
+    
+    TXT = "search_gps.txt"
     if os.path.isfile(TXT):
         os.remove(TXT)
     
@@ -203,10 +273,10 @@ def main(argv):
         LON = P_Lon[kk[i]]
         DB = P_Dbeg[kk[i]] 
         DE = P_Dend[kk[i]]
-        
-        print '     ' + str(Nm) + '           ' + str(LAT) + '       ' + str(LON) + '       ' + str(DB) + '     ' + str(DE) 
-        call_str = 'echo ' + str(Nm) + ' ' + str(LAT) + ' ' + str(LON)   +  ' ' + str(DB) + ' ' + str(DE) + ' >> ' + TXT
+        call_str = 'echo ' + str(Nm) + ' ' + str(LAT) + ' ' + str(LON)   + ' ' + str(DB) + ' ' + str(DE) + ' ' + str(TS) + ' ' + str(INC) + ' ' + str(HEAD) + ' >> ' + TXT
         os.system(call_str)
+        print '     ' + str(Nm) + '           ' + str(LAT) + '       ' + str(LON) + '       ' + str(DB) + '     ' + str(DE) 
+        
                
 
 if __name__ == '__main__':
