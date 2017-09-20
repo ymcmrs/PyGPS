@@ -340,7 +340,7 @@ def main(argv):
         else: Master = UNW_NM.split('-')[0]
         Master = unitdate(Master)
   
-        if inps.slave: Master = inps.master
+        if inps.slave: Slave = inps.slave
         else: Slave = UNW_NM.split('-')[1].split('_')[0]
         Slave = unitdate(Slave)
         
