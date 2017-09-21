@@ -373,21 +373,23 @@ def main(argv):
         
         for j in range(N):
                 print_progress(j+1, N, prefix='Station name: ', suffix=NM[j])
-                idx = GPS_NM.index(NM[j])
-                RANGE = GPS_RANGE[idx]
-                AZIMUTH = GPS_AZIMUTH[idx]
-                XX= min_dist(InSAR_Data,RANGE,AZIMUTH)
-                DD = float(XX[0])
-                if DD< Max_Dist:
-                    NM_DEF.append(NM[j])
-                    DIST_DEF.append(XX[0])
-                    RANGE_DEF.append(XX[1])
-                    AZIMUTH_DEF.append(XX[2])
-                    NUMBER_DEF.append(XX[3])
-                    ZTD_DEF.append(GPS_ZTD[j])
-                    STD_DEF.append(GPS_STD[j])
-                    LAT_DEF.append(LAT[j])
-                    LON_DEF.append(LON[j])
+                
+                if NM[j] in GPS_NM:
+                    idx = GPS_NM.index(NM[j])
+                    RANGE = GPS_RANGE[idx]
+                    AZIMUTH = GPS_AZIMUTH[idx]
+                    XX= min_dist(InSAR_Data,RANGE,AZIMUTH)
+                    DD = float(XX[0])
+                    if DD< Max_Dist:
+                        NM_DEF.append(NM[j])
+                        DIST_DEF.append(XX[0])
+                        RANGE_DEF.append(XX[2])
+                        AZIMUTH_DEF.append(XX[1])
+                        NUMBER_DEF.append(XX[3])
+                        ZTD_DEF.append(GPS_DEF[j])
+                        STD_DEF.append(GPS_STD[j])
+                        LAT_DEF.append(LAT[j])
+                        LON_DEF.append(LON[j])
                     
         if inps.ref_gps:
             REF_NM = inps.ref_gps
@@ -415,7 +417,7 @@ def main(argv):
         N =len(NM_DEF)
         
         for i in range(N):
-            STD_ATM[i] = (STD_DEF[i]**2 + STD_DEF[IDX]**2)**0.5
+            STD_DEF[i] = (float(STD_DEF[i])**2 + float(STD_DEF[IDX])**2)**0.5
         STD_DEF[IDX] =0
         
         DEF_TXT = Master + '-' + Slave + '_InSAR_GPS_DEF_' + REF_NM
@@ -423,9 +425,10 @@ def main(argv):
             os.remove(DEF_TXT)
         
         for i in range(N):
-            STR = str(NM_DEF[i]) + ' ' + str(LAT_DEF[i]) + ' ' + str(LON_DEF[i]) + ' ' + str(RANGE_DEF[i]) + ' ' + str(AZIMUTH_DEF[i]) + ' ' + str(InSAR[AZIMUTH_DEF[i]][RANGE_DEF[i]]/4/np.pi*0.056) + ' ' + str(GPS0[i]) + ' ' + str(STD_DEF[i]) + ' ' + str(DIST_DEF[i]) + ' ' + str(NUMBER_DEF[i])
-            call_str = 'echo ' + STR + ' >> '  + DEF_TXT
-            os.system(call_str) 
+            if (-1<int(AZIMUTH_DEF[i]) and int(AZIMUTH_DEF[i])< int(LENGTH)) and (-1<int(RANGE_DEF[i]) and int(RANGE_DEF[i])<int(WIDTH)):
+                STR = str(NM_DEF[i]) + ' ' + str(LAT_DEF[i]) + ' ' + str(LON_DEF[i]) + ' ' + str(RANGE_DEF[i]) + ' ' + str(AZIMUTH_DEF[i]) + ' ' + str(InSAR[AZIMUTH_DEF[i]][RANGE_DEF[i]]/4/np.pi*0.056) + ' ' + str(GPS0[i]) + ' ' + str(STD_DEF[i]) + ' ' + str(DIST_DEF[i]) + ' ' + str(NUMBER_DEF[i])
+                call_str = 'echo ' + STR + ' >> '  + DEF_TXT
+                os.system(call_str) 
     
 
     
