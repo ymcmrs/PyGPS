@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 ############################################################
-# Program is part of PySAR v1.2                            #
+# Program is part of PyGPS v1.2                            #
 # Copyright(c) 2017, Yunmeng Cao                           #
 # Author:  Yunmeng Cao                                     #
 ############################################################
