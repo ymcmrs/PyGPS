@@ -1,13 +1,9 @@
 #! /usr/bin/env python
-
-#'''
-##################################################################################
-###         Author:   Yun-Meng Cao                                             ### 
-###         Date  :   March, 2017                                              ###  
-###         Email :   ymcmrs@gmail.com                                         ###   
-### Transform LAT/LON coordinates into SAR coordinates based on lookup table   ###    
-##################################################################################
-#'''
+############################################################
+# Program is part of PyGPS v1.0                            #
+# Copyright(c) 2017, Yunmeng Cao                           #
+# Author:  Yunmeng Cao                                     #
+############################################################
 
 
 import os
