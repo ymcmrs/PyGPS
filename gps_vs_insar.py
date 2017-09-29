@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 ############################################################
-# Program is part of PyGPS v1.0                            #
+# Program is part of TSSAR v1.0                            #
 # Copyright(c) 2017, Yunmeng Cao                           #
 # Author:  Yunmeng Cao                                     #
 ############################################################
@@ -240,7 +240,7 @@ def main(argv):
         else: Master = UNW_NM.split('-')[0]
         Master = unitdate(Master)
     
-        if inps.slave: Master = inps.master
+        if inps.slave: Slave = inps.slave
         else: Slave = UNW_NM.split('-')[1].split('_')[0]
         Slave = unitdate(Slave)
         
@@ -251,6 +251,7 @@ def main(argv):
         if not os.path.isfile(DIFF_ATM):
             call_str = 'diff_gps_space.py ' + Master + ' -d ' + Slave + ' --Atm'
             os.system(call_str)
+        
         
         GPS = np.loadtxt(DIFF_ATM,dtype=np.str)
         NM = GPS[:,0]
@@ -272,6 +273,7 @@ def main(argv):
         LON_ATM = []
         
         for j in range(N):
+            if NM[j] in GPS_NM:
                 #print_progress(j+1, N, prefix='Station name: ', suffix = NM[j])
                 idx = GPS_NM.index(NM[j])
                 RANGE = GPS_RANGE[idx]
@@ -310,7 +312,7 @@ def main(argv):
         
         InSAR = InSAR_Data
         InSAR = InSAR - InSAR[REF_AZIMUTH][REF_RANGE]
-        InSAR = -InSAR
+        #InSAR = -InSAR
         
         ZTD_ATM = map(float,ZTD_ATM)
         ZTD_ATM = np.asarray(ZTD_ATM)
@@ -327,10 +329,11 @@ def main(argv):
             os.remove(ATM_TXT)
         
         for i in range(N):
-            STR = str(NM_ATM[i]) + ' ' + str(LAT_ATM[i]) + ' ' + str(LON_ATM[i]) + ' ' + str(RANGE_ATM[i]) + ' ' + str(AZIMUTH_ATM[i]) + ' ' + str(InSAR[AZIMUTH_ATM[i]][RANGE_ATM[i]]/4/np.pi*0.056) + ' ' + str(GPS0[i]) + ' ' + str(STD_ATM[i]) + ' ' + str(DIST_ATM[i]) + ' ' + str(NUMBER_ATM[i])
+            if (-1<int(AZIMUTH_ATM[i]) and int(AZIMUTH_ATM[i])< int(LENGTH)) and (-1<int(RANGE_ATM[i]) and int(RANGE_ATM[i])<int(WIDTH)):
+                STR = str(NM_ATM[i]) + ' ' + str(LAT_ATM[i]) + ' ' + str(LON_ATM[i]) + ' ' + str(RANGE_ATM[i]) + ' ' + str(AZIMUTH_ATM[i]) + ' ' + str(InSAR[AZIMUTH_ATM[i]][RANGE_ATM[i]]/4/np.pi*0.056) + ' ' + str(GPS0[i]) + ' ' + str(STD_ATM[i]) + ' ' + str(DIST_ATM[i]) + ' ' + str(NUMBER_ATM[i])
 
-            call_str = 'echo ' + STR + ' >> '  + ATM_TXT
-            os.system(call_str) 
+                call_str = 'echo ' + STR + ' >> '  + ATM_TXT
+                os.system(call_str) 
             
             
 ############################## deformation comparison #########################################
@@ -372,24 +375,24 @@ def main(argv):
         LON_DEF = []
         
         for j in range(N):
-                print_progress(j+1, N, prefix='Station name: ', suffix=NM[j])
+            print_progress(j+1, N, prefix='Station name: ', suffix=NM[j])
                 
-                if NM[j] in GPS_NM:
-                    idx = GPS_NM.index(NM[j])
-                    RANGE = GPS_RANGE[idx]
-                    AZIMUTH = GPS_AZIMUTH[idx]
-                    XX= min_dist(InSAR_Data,RANGE,AZIMUTH)
-                    DD = float(XX[0])
-                    if DD< Max_Dist:
-                        NM_DEF.append(NM[j])
-                        DIST_DEF.append(XX[0])
-                        RANGE_DEF.append(XX[2])
-                        AZIMUTH_DEF.append(XX[1])
-                        NUMBER_DEF.append(XX[3])
-                        ZTD_DEF.append(GPS_DEF[j])
-                        STD_DEF.append(GPS_STD[j])
-                        LAT_DEF.append(LAT[j])
-                        LON_DEF.append(LON[j])
+            if NM[j] in GPS_NM:
+                idx = GPS_NM.index(NM[j])
+                RANGE = GPS_RANGE[idx]
+                AZIMUTH = GPS_AZIMUTH[idx]
+                XX= min_dist(InSAR_Data,RANGE,AZIMUTH)
+                DD = float(XX[0])
+                if DD< Max_Dist:
+                    NM_DEF.append(NM[j])
+                    DIST_DEF.append(XX[0])
+                    AZIMUTH_DEF.append(XX[1])
+                    RANGE_DEF.append(XX[2])
+                    NUMBER_DEF.append(XX[3])
+                    ZTD_DEF.append(GPS_DEF[j])
+                    STD_DEF.append(GPS_STD[j])
+                    LAT_DEF.append(LAT[j])
+                    LON_DEF.append(LON[j])
                     
         if inps.ref_gps:
             REF_NM = inps.ref_gps
