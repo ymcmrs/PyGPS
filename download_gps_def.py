@@ -16,7 +16,6 @@ import astropy.time
 import dateutil.parser
 import math
 
-import matplotlib.pyplot as plt
 from matplotlib.ticker import MultipleLocator, FormatStrFormatter
 
 def print_progress(iteration, total, prefix='calculating:', suffix='complete', decimals=1, barLength=50, elapsed_time=None):
@@ -99,16 +98,24 @@ def yyyymmdd2yyyydd(DATE):
 def date2yymondd(DATE):
     Mon = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC']
     
+    if len(str(int(DATE)))==5:
+        YY = DATE[0:1]
+        MM = DATE[1:3]
+        MO = Mon[int(MM)-1]
+        DD = DATE[3:5]
+        
     if len(str(int(DATE)))==6:
         YY = DATE[0:2]
         MM = DATE[2:4]
         MO = Mon[int(MM)-1]
         DD = DATE[4:6]
-    else:
+    if len(str(int(DATE)))==8:
         YY = DATE[2:4]
         MM = DATE[4:6]
         MO = Mon[int(MM)-1]
         DD = DATE[6:8]
+        
+        
     ST = YY+MO+DD
     return ST
         
@@ -136,7 +143,10 @@ def readdate(DATESTR):
         
 def unitdate(DATE):
     LE = len(str(int(DATE)))
-    DATE = str(DATE)
+    DATE = str(int(DATE))
+    
+    if LE==5:
+        DATE = '200' + DATE
     
     if LE == 6:
         YY = int(DATE[0:2])
@@ -235,7 +245,7 @@ def main(argv):
     print DD
     
     for j in range(k):
-        OUT = 'gps_def_raw_' + str(int(DD[j]))
+        OUT = 'gps_def_raw_' + unitdate(str(int(DD[j])))
         if os.path.isfile(OUT):
             os.remove(OUT)
     
@@ -254,7 +264,7 @@ def main(argv):
         for j in range(k):
             OUT = 'gps_def_raw_' + unitdate(str(int(DD[j])))
             OUT_LOS = 'gps_def_los_' + unitdate(str(int(DD[j])))
-            DT = str(int(DD[j]))
+            DT = unitdate(str(int(DD[j])))
             ST = date2yymondd(DT)
                     
             call_str = "grep " + ST + ' ' + FILE + '>> ' + OUT

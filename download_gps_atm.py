@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 ############################################################
-# Program is part of PyGPS v1.0                            #
+# Program is part of TSSAR v1.0                            #
 # Copyright(c) 2017, Yunmeng Cao                           #
 # Author:  Yunmeng Cao                                     #
 ############################################################
@@ -16,8 +16,7 @@ import math
 import astropy.time
 import dateutil.parser
 
-import matplotlib.pyplot as plt
-from matplotlib.ticker import MultipleLocator, FormatStrFormatter
+
 
 def print_progress(iteration, total, prefix='calculating:', suffix='complete', decimals=1, barLength=50, elapsed_time=None):
     """Print iterations progress - Greenstick from Stack Overflow
@@ -116,7 +115,9 @@ def yyyy2yyyymmddhhmmss(t0):
 
 def unitdate(DATE):
     LE = len(str(int(DATE)))
-    DATE = str(DATE)
+    DATE = str(int(DATE))
+    if LE==5:
+        DATE = '200' + DATE  
     
     if LE == 6:
         YY = int(DATE[0:2])

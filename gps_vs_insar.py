@@ -104,7 +104,10 @@ def yyyy2yyyymmddhhmmss(t0):
 
 def unitdate(DATE):
     LE = len(str(int(DATE)))
-    DATE = str(DATE)
+    DATE = str(int(DATE))
+    
+    if LE ==5:
+        DATE ='200' + DATE
     
     if LE == 6:
         YY = int(DATE[0:2])
@@ -185,6 +188,8 @@ def cmdLineParse():
     parser.add_argument('--diff_def', dest = 'diff_def',  help='differential file of GPS Def results.')
     parser.add_argument('-t','--trans',dest='gps_coord',  help='GPS coordinates transfomration file.')
     parser.add_argument('--byteorder', dest = 'byteorder', help='byte order of the unwrap image.')
+    parser.add_argument('--AtmDir',dest='AtmDir', help='GPS-based atm datasets directory. [default: current directory.]')
+    parser.add_argument('--DefDir',dest='DefDir', help='GPS-based def datasets directory.[default: current directory.]')
     parser.add_argument('--Atm',action="store_true", default=False, help='Comparing APS results of InSAR and GPS.')
     parser.add_argument('--Def', action="store_true", default=False, help='Comparing DEF results of InSAR and GPS.')
     
@@ -204,12 +209,12 @@ def main(argv):
     UNW = inps.UNW
     WIDTH = inps.width
     UNW_NM = os.path.basename(UNW)
+    DIR0 = os.getcwd()
     
     if inps.gps_coord:  GPS_COORD = inps.gps_coord
     else: GPS_COORD = 'gps_coord.txt'
         
     if not os.path.isfile(GPS_COORD):
-        parser.print_usage()
         sys.exit(os.path.basename(sys.argv[0])+': error: GPS coordinates transformation file is not found.')
     
     if inps.byteorder: Byteorder = inps.byteorder
@@ -236,6 +241,10 @@ def main(argv):
   
     
     if inps.Atm:
+        if inps.AtmDir:
+            ATMDIR = inps.AtmDir
+        else:
+            ATMDIR = os.getcwd()
         if inps.master: Master = inps.master
         else: Master = UNW_NM.split('-')[0]
         Master = unitdate(Master)
@@ -247,8 +256,9 @@ def main(argv):
         if inps.diff_atm: DIFF_ATM = inps.diff_atm
         else: 
             DIFF_ATM = 'diff_atm_' + Master + '-' + Slave
-        
+            DIFF_ATM =ATMDIR + '/' + DIFF_ATM
         if not os.path.isfile(DIFF_ATM):
+            os.chdir(ATMDIR)
             call_str = 'diff_gps_space.py ' + Master + ' -d ' + Slave + ' --Atm'
             os.system(call_str)
         
@@ -324,7 +334,7 @@ def main(argv):
             STD_ATM[i] = (float(SS[i])**2 + float(SS[IDX])**2)**0.5
         STD_ATM[IDX] =0
         
-        ATM_TXT = Master + '-' + Slave + '_InSAR_GPS_ATM_' + REF_NM
+        ATM_TXT = DIR0 + '/' + Master + '-' + Slave + '_InSAR_GPS_ATM_' + REF_NM
         if os.path.isfile(ATM_TXT):
             os.remove(ATM_TXT)
         
@@ -339,6 +349,11 @@ def main(argv):
 ############################## deformation comparison #########################################
 
     if inps.Def:
+        if inps.DefDir:
+            DEFDIR = inps.DefDir
+        else:
+            DEFDIR = os.getcwd()
+            
         if inps.master: Master = inps.master
         else: Master = UNW_NM.split('-')[0]
         Master = unitdate(Master)
@@ -350,8 +365,10 @@ def main(argv):
         if inps.diff_def: DIFF_DEF = inps.diff_def
         else:   
             DIFF_DEF = 'diff_def_' + Master + '-' + Slave
+            DIFF_DEF = DEFDIR + '/' + DIFF_DEF
             
         if not os.path.isfile(DIFF_DEF):
+            os.chdir(DEFDIR)
             call_str = 'diff_gps_space.py ' + Master + ' -d ' + Slave + ' --Def'
             os.system(call_str)    
             
@@ -423,7 +440,7 @@ def main(argv):
             STD_DEF[i] = (float(STD_DEF[i])**2 + float(STD_DEF[IDX])**2)**0.5
         STD_DEF[IDX] =0
         
-        DEF_TXT = Master + '-' + Slave + '_InSAR_GPS_DEF_' + REF_NM
+        DEF_TXT = DIR0 + '/' + Master + '-' + Slave + '_InSAR_GPS_DEF_' + REF_NM
         if os.path.isfile(DEF_TXT):
             os.remove(DEF_TXT)
         
