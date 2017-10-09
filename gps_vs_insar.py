@@ -247,7 +247,7 @@ def main(argv):
             ATMDIR = os.getcwd()
         if inps.master: Master = inps.master
         else: Master = UNW_NM.split('-')[0]
-        Master = unitdate(Master)
+        Master = unitdate(Master) 
     
         if inps.slave: Slave = inps.slave
         else: Slave = UNW_NM.split('-')[1].split('_')[0]
