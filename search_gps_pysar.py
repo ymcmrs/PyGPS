@@ -16,6 +16,39 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import MultipleLocator, FormatStrFormatter
 import pysar._readfile as readfile
 
+############### function to get image corners ################
+def read_region(STR):
+    WEST = STR.split('/')[0]
+    EAST = STR.split('/')[1].split('/')[0]
+    
+    SOUTH = STR.split(EAST+'/')[1].split('/')[0]
+    NORTH = STR.split(EAST+'/')[1].split('/')[1]
+    
+    WEST =float(WEST)
+    SOUTH=float(SOUTH)
+    EAST=float(EAST)
+    NORTH=float(NORTH)
+    return WEST,SOUTH,EAST,NORTH
+
+
+def get_corner(h5file):
+    atr=readfile.read_attribute(h5file)
+    LAT1 = atr['LAT_REF1'];LAT2 = atr['LAT_REF2'];LAT3 = atr['LAT_REF3'];LAT4 = atr['LAT_REF4']
+    LON1 = atr['LON_REF1'];LON2 = atr['LON_REF2'];LON3 = atr['LON_REF3'];LON4 = atr['LON_REF4']
+   
+    LAT = [float(LAT1),float(LAT2),float(LAT3),float(LAT4)]
+    LON = [float(LON1),float(LON2),float(LON3),float(LON4)]
+    
+    return LAT,LON
+
+def get_corner_box(box):
+    WEST,SOUTH,EAST,NORTH = read_region(box);
+    LAT1 = NORTH;LAT2 = NORTH;LAT3 = SOUTH;LAT4 = SOUTH
+    LON1 = WEST;LON2 = EAST;LON3 = EAST;LON4 = WEST
+    LAT = [float(LAT1),float(LAT2),float(LAT3),float(LAT4)]
+    LON = [float(LON1),float(LON2),float(LON3),float(LON4)]
+    
+    return LAT,LON
 
 ##############  function to search points in a polygan #########################
 def cn_PnPoly(P, V):
@@ -114,8 +147,11 @@ INTRODUCTION = '''
 
 
 EXAMPLE = '''EXAMPLES:
-    search_gps_pysar.py velocity.h5
-    search_gps_pysar.py demGeo.h5 -s 20100102 -o gps_LosAngeles.txt
+    search_gps_pysar.py -f velocity.h5
+    search_gps_pysar.py -b 120/122/34/38
+    search_gps_pysar.py -f unwrapIfgram.h5 -s 20100102 -o gps_LosAngeles.txt
+    search_gps_pysar.py -f demGeo.h5 -s 20100102 --inside -o gps_LosAngeles.txt
+    
 '''
 
 
@@ -124,12 +160,19 @@ def cmdLineParse():
                                      formatter_class=argparse.RawTextHelpFormatter,\
                                      epilog=INTRODUCTION+'\n'+EXAMPLE)
 
-    parser.add_argument('file', help='h5 file used to check area region.')
+    parser.add_argument('-f',dest='file', help='h5 file used to check area region.')
+    parser.add_argument('-b', dest='box',help='box corners of research region. e.g., 120/122/33/34 ')
     parser.add_argument('-s', dest='start', help='start date.')
     parser.add_argument('-e', dest='end', help='end date.')
     parser.add_argument('-o', dest='out', help='output file name.')
+    parser.add_argument('--inside', action="store_true", default=False, help='Constraining stations inside the SAR coverage, otherwise, in the corner rectangle region.')
     
     inps = parser.parse_args()
+    
+    if not inps.file and not inps.box:
+        parser.print_usage()
+        sys.exit(os.path.basename(sys.argv[0])+': error: h5file or coverage box at least one should be provided.')
+
     
 
     return inps
@@ -139,47 +182,34 @@ def cmdLineParse():
 
 def main(argv):
     
-    inps = cmdLineParse()
-    FILE = inps.file
-    atr=readfile.read_attribute(FILE)
+    inps = cmdLineParse() 
+    if inps.file:
+        LAT,LON = get_corner(inps.file)
+        VP = [[LAT[0],LON[0]],[LAT[1],LON[1]],[LAT[3],LON[3]],[LAT[2],LON[2]],[LAT[0],LON[0]]];
+    elif inps.box:
+        LAT,LON = get_corner_box(inps.box)
+        VP = [[LAT[0],LON[0]],[LAT[1],LON[1]],[LAT[2],LON[2]],[LAT[3],LON[3]],[LAT[0],LON[0]]];
     
-    if inps.out: OUT = inps.out
-    else: OUT = 'search_gps.txt'
-    
-    PSXY = 'search_gps_psxy'
-    PSTEXT = 'search_gps_pstext'
-    #TS = atr['CENTER_LINE_UTC']
-    #HEAD = atr['HEADING']
-    #INC = str((float(atr['LOOK_REF1'])+float(atr['LOOK_REF2']))/2)  # mean look angle
+        
+    #print LAT
+    #print LON
+    #print VP
     
     
-    if 'X_FIRST' in atr:
-        lat1 = float(atr['Y_FIRST'])
-        lon1 = float(atr['X_FIRST'])
+    
+    
+    OUT= 'search_gps.txt'
+    PSXY = 'gps_latlon'
+    PSTEXT = 'gps_latlon_name'
+    
+    if inps.inside:
+        OUT = 'search_gps_inside.txt'
         
-        lat2 = float(atr['Y_FIRST'])
-        lon2 = float(atr['X_FIRST'])+int(atr['X_MAX'])*float(atr['X_STEP'])
-        
-        lat3 = float(atr['Y_FIRST'])+int(atr['Y_MAX'])*float(atr['Y_STEP'])
-        lon3 = float(atr['X_FIRST'])+int(atr['X_MAX'])*float(atr['X_STEP'])
-        
-        lat4 = float(atr['Y_FIRST'])+int(atr['Y_MAX'])*float(atr['Y_STEP'])
-        lon4 = float(atr['X_FIRST'])
-        
-        v1 = [lat1,lon1]
-        v2 = [lat2,lon2]
-        v3 = [lat3,lon3]
-        v4 = [lat4,lon4]
-        
-    if 'LAT_REF1' in atr:
-        v1 = [float(atr['LAT_REF1']),float(atr['LON_REF1'])]
-        v2 = [float(atr['LAT_REF2']),float(atr['LON_REF2'])]
-        v3 = [float(atr['LAT_REF3']),float(atr['LON_REF3'])]    
-        v4 = [float(atr['LAT_REF4']),float(atr['LON_REF4'])]
-      
-    V =[v1,v2,v3,v4]
-    LAT =[v1[0],v2[0],v3[0],v4[0]]
-    LON=[v1[1],v2[1],v3[1],v4[1]]
+    if inps.out:
+        OUT = inps.out
+   
+       
+    
     
     call_str = 'wget -q http://geodesy.unr.edu/NGLStationPages/DataHoldings.txt'
     os.system(call_str)
@@ -215,8 +245,7 @@ def main(argv):
     
     rm('t_Lat'),rm('t_Lon'),rm('t_Dbeg'),rm('t_Name'),rm('DataHoldings.txt'),rm('t_Dend'),rm('tt')
     
-    print LAT
-    print LON
+
     MinLat = min(LAT)
     MaxLat = max(LAT)
     MinLon = min(LON)
@@ -266,7 +295,14 @@ def main(argv):
         dt1 = float_yyyymmdd(P_Dbeg[kk[i]])
         dt2 = float_yyyymmdd(P_Dend[kk[i]])
         if (dt1 > date1 and dt1 < date2) or (dt2 > date1 and dt2 < date2) or ( dt1<date1 and date2 < dt2):
-            kk_mod.append(kk[i])
+            k_flag = 1
+            if inps.inside:
+                LA0 = P_Lat[kk[i]];LO0  = P_Lon[kk[i]]
+                PP0 = [float(LA0),float(LO0)-360];
+                #print PP0
+                k_flag = cn_PnPoly(PP0, VP)
+            if k_flag==1:            
+                kk_mod.append(kk[i])
     
     kk = kk_mod
     x = len(kk)
@@ -294,7 +330,7 @@ def main(argv):
         DB = P_Dbeg[kk[i]] 
         DE = P_Dend[kk[i]]
         #call_str = 'echo ' + str(Nm) + ' ' + str(LAT) + ' ' + str(LON)   + ' ' + str(DB) + ' ' + str(DE) + ' ' + str(TS) + ' ' + str(INC) + ' ' + str(HEAD) + ' >> ' + OUT
-        call_str = 'echo ' + str(Nm) + ' ' + str(LAT) + ' ' + str(LON)   + ' ' + str(DB) + ' ' + str(DE) + ' 0 35.5 -167.8025324' + ' >> ' + OUT
+        call_str = 'echo ' + str(Nm) + ' ' + str(LAT) + ' ' + str(LON)   + ' ' + str(DB) + ' ' + str(DE) + ' >> ' + OUT
         #call_str = 'echo ' + str(Nm) + ' ' + str(LAT) + ' ' + str(LON)   + ' ' + str(DB) + ' ' + str(DE) + ' >> ' + OUT
         os.system(call_str)
         
