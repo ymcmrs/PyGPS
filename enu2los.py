@@ -199,8 +199,8 @@ def main(argv):
     Nm = inps.station_name
     Inc = inps.incidence
     Head = inps.heading
-    Theta = Inc
-    HEAD = Head
+    Theta = float(Inc)
+    HEAD = float(Head)
     
     if HEAD < 0:
           HEAD = HEAD+360 
@@ -212,6 +212,10 @@ def main(argv):
     unitVar = [unitVec[0]**2,unitVec[1]**2,unitVec[2]**2]
     
     FILE = Nm + '_TS_ENU'
+    if not os.path.isfile(Nm):
+        call_str='download_gps_def_station.py ' + Nm
+        os.system(call_str)
+    
     GPS = np.loadtxt(FILE,dtype = np.str)
     
     YYYY = GPS[:,0]
@@ -224,7 +228,8 @@ def main(argv):
     Sig_N = GPS[:,6]
     Sig_U = GPS[:,7]
         
-        
+
+    
     Def_E = Def_E.astype(np.float)
     Def_N = Def_N.astype(np.float)
     Def_U = Def_U.astype(np.float)
@@ -233,12 +238,32 @@ def main(argv):
     Sig_N = Sig_N.astype(np.float)
     Sig_U = Sig_U.astype(np.float)
         
-        
+    
+    
     Def_LOS = Def_E*unitVec[0] + Def_N*unitVec[1] + Def_U*unitVec[2]
     Sig_LOS = ((Sig_E**2)*(unitVec[0]**2) + (Sig_N**2)*(unitVec[1]**2) + (Sig_U**2)*(unitVec[2]**2))**0.5
-        
-    DATA = [YYYY,JMD,Def_LOS,Sig_LOS]
-    print DATA
+    
+    YYYY = YYYY.astype(np.float)
+    JMD = JMD.astype(np.float)
+    Def_LOS = Def_LOS.astype(np.float)
+    Sig_LOS = Sig_LOS.astype(np.float)
+    
+    np.savetxt('t1',YYYY);
+    np.savetxt('t2',JMD);
+    np.savetxt('t3',Def_LOS);
+    np.savetxt('t4',Sig_LOS);
+    #N0 = len(Def_LOS)
+    #OUT_LOS = Nm+'_TS_LOS'
+    #for j in range(N0):
+    #    STR = str(YYYY[j]) + ' ' + str(JMD[j]) + ' ' + str(Def_LOS[j]) + ' ' + str(Sig_LOS[j]) 
+    #    call_str = 'echo ' + STR + ' >> ' + OUT_LOS 
+    #    os.system(call_str)
+    
+    call_str = 'paste t1 t2 t3 t4 >' + Nm+'_TS_LOS'
+    os.system(call_str)
+    
+    call_str ='rm t1 t2 t3 t4'
+    os.system(call_str)
             
             
 if __name__ == '__main__':
