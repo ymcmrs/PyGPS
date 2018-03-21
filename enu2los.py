@@ -183,9 +183,9 @@ def cmdLineParse():
                                      formatter_class=argparse.RawTextHelpFormatter,\
                                      epilog=INTRODUCTION+'\n'+EXAMPLE)
 
-    parser.add_argument('gps_txt',help='Available GPS station information.')
-    parser.add_argument('-d', dest='time', help='SAR acquisition time.')
-    parser.add_argument('--datetxt', dest='datetxt', help='text file of date for downloading.')
+    parser.add_argument('station_name',help='Available GPS station information.')
+    parser.add_argument('incidence', help='Incidence angle.')
+    parser.add_argument('heading', help='Heading angle.')
     
     inps = parser.parse_args()
 
@@ -196,25 +196,12 @@ def cmdLineParse():
 def main(argv):
     
     inps = cmdLineParse()
+    Nm = inps.station_name
+    Inc = inps.incidence
+    Head = inps.heading
+    Theta = Inc
+    HEAD = Head
     
-    TXT = inps.gps_txt
-    GPS= np.loadtxt(TXT, dtype = np.str)
-    GPS_Nm =GPS[:,0]
-    GPS_Nm = GPS_Nm.tolist()
-    GPS_LAT = GPS[:,1]
-    GPS_LON = GPS[:,2]
-    N = len(GPS_Nm) 
-    t0 = GPS[0,5]
-    t0 =float(t0)/3600/24
-    t0 = float(t0)*24*12
-    t0 = round(t0)
-    t0 = t0 * 300
-    
-    Tm =str(int(t0))
-    
-    Theta = float(GPS[0,6])
-    HEAD = float(GPS[0,7])
-
     if HEAD < 0:
           HEAD = HEAD+360 
 
@@ -224,95 +211,34 @@ def main(argv):
     unitVec=[np.cos(HEAD)*np.sin(Theta),-np.sin(Theta)*np.sin(HEAD),-np.cos(Theta)]    
     unitVar = [unitVec[0]**2,unitVec[1]**2,unitVec[2]**2]
     
-    if inps.time:
-        DATESTR = inps.time
-        DD=readdate(DATESTR)
-        k = len(DD)
-    else:
-        DATETXT = inps.datetxt
-        DD = np.loadtxt(DATETXT)
-        k = DD.size
-        AA =[]
-        if k ==1:
-            AA.append(str(int(DD)))
-        else:
-            for i in range(k):
-                AA.append(str(int(DD[i])))
-        DD = AA
-        
-    print ''
-    print "Downloaded date: "
-    print DD
+    FILE = Nm + '_TS_ENU'
+    GPS = np.loadtxt(FILE,dtype = np.str)
     
-    for j in range(k):
-        OUT = 'gps_def_raw_' + unitdate(str(int(DD[j])))
-        if os.path.isfile(OUT):
-            os.remove(OUT)
-    
-    print 'Start to download GPS deformation data >>>'
-    print ''
-    for i in range(N):
-        Nm =str(GPS_Nm[i])
-        print_progress(i+1, N, prefix='Station name: ', suffix=Nm)
-        FILE = Nm + '.IGS08.tenv3'
+    YYYY = GPS[:,0]
+    JMD = GPS[:,1]
+    Def_E = GPS[:,2]
+    Def_N = GPS[:,3]
+    Def_U = GPS[:,4]
         
-        if not os.path.isfile(FILE):
-            call_str = "wget -q http://geodesy.unr.edu/gps_timeseries/tenv3/IGS08/" + FILE
-            os.system(call_str)
+    Sig_E = GPS[:,5]
+    Sig_N = GPS[:,6]
+    Sig_U = GPS[:,7]
         
         
-        for j in range(k):
-            OUT = 'gps_def_raw_' + unitdate(str(int(DD[j])))
-            OUT_LOS = 'gps_def_los_' + unitdate(str(int(DD[j])))
-            DT = unitdate(str(int(DD[j])))
-            ST = date2yymondd(DT)
-                    
-            call_str = "grep " + ST + ' ' + FILE + '>> ' + OUT
-            os.system(call_str)
-    
-    call_str = 'rm *tenv3'
-    os.system(call_str)
-    
-    print 'Available GPS station number for each SAR aquisition: ' 
-    
-    for i in range(k):
-        OUT = 'gps_def_raw_' + unitdate(str(int(DD[i])))
-        OUT_LOS = 'gps_def_los_' + unitdate(str(int(DD[i])))
-        if os.path.isfile(OUT_LOS):
-            os.remove(OUT_LOS)
+    Def_E = Def_E.astype(np.float)
+    Def_N = Def_N.astype(np.float)
+    Def_U = Def_U.astype(np.float)
         
-        GPS = np.loadtxt(OUT,dtype = np.str)
-        NM = GPS[:,0]
-        Def_E = GPS[:,8]
-        Def_N = GPS[:,10]
-        Def_U = GPS[:,12]
-        
-        Sig_E = GPS[:,14]
-        Sig_N = GPS[:,15]
-        Sig_U = GPS[:,16]
+    Sig_E = Sig_E.astype(np.float)
+    Sig_N = Sig_N.astype(np.float)
+    Sig_U = Sig_U.astype(np.float)
         
         
-        Def_E = Def_E.astype(np.float)
-        Def_N = Def_N.astype(np.float)
-        Def_U = Def_U.astype(np.float)
+    Def_LOS = Def_E*unitVec[0] + Def_N*unitVec[1] + Def_U*unitVec[2]
+    Sig_LOS = ((Sig_E**2)*(unitVec[0]**2) + (Sig_N**2)*(unitVec[1]**2) + (Sig_U**2)*(unitVec[2]**2))**0.5
         
-        Sig_E = Sig_E.astype(np.float)
-        Sig_N = Sig_N.astype(np.float)
-        Sig_U = Sig_U.astype(np.float)
-        
-        
-        Def_LOS = Def_E*unitVec[0] + Def_N*unitVec[1] + Def_U*unitVec[2]
-        Sig_LOS = ((Sig_E**2)*(unitVec[0]**2) + (Sig_N**2)*(unitVec[1]**2) + (Sig_U**2)*(unitVec[2]**2))**0.5
-        
-        N0 = len(Def_LOS)
-        
-        for j in range(N0):
-            LAT = GPS_LAT[GPS_Nm.index(NM[j])]
-            LON = GPS_LON[GPS_Nm.index(NM[j])]
-            STR = str(NM[j]) + ' ' + str(LAT) + ' ' + str(LON) + ' ' + str(Def_LOS[j]) + ' ' + str(Sig_LOS[j])
-            call_str = 'echo ' + STR + ' >> ' + OUT_LOS 
-            os.system(call_str)
-        print str(DD[i]) + ' :' + str(N0)    
+    DATA = [YYYY,JMD,Def_LOS,Sig_LOS]
+    print DATA
             
             
 if __name__ == '__main__':
