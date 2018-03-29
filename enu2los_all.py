@@ -171,15 +171,16 @@ INTRODUCTION = '''GPS:
 '''
 
 EXAMPLE = '''EXAMPLES:
-    download_gps_def.py search_gps.txt -d 20150101
-    download_gps_def.py search_gps.txt -d 20150101,20150203
-    download_gps_def.py search_gps.txt -datetxt /Yunmeng/SCRATCH/LosAngeles.txt
+  
+    enu2los_all.py gps_geometry_par.txt 
+    enu2los_all.py gps_geometry_par.txt --inc 23.1 --head -160.5
+  
 '''    
     
 
 
 def cmdLineParse():
-    parser = argparse.ArgumentParser(description='Download GPS data over SAR coverage.',\
+    parser = argparse.ArgumentParser(description='Transfer enu def to SAR los direction.',\
                                      formatter_class=argparse.RawTextHelpFormatter,\
                                      epilog=INTRODUCTION+'\n'+EXAMPLE)
 
