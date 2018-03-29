@@ -1,5 +1,5 @@
 # PyGPS
-Incorporate GPS and InSAR based on python both for deformation estimation and atmosphere correction.
+Incorporate GPS and InSAR based on python both for deformation estimation, atmosphere correction, and water vapor inversion problems.
 
 ######################################################################################   
 1. Search available GPS stations over the research region. (All of the available GPS network over World will be used)     
