@@ -10,11 +10,12 @@ import numpy as np
 import getopt
 import sys
 import os
-import h5py
 import argparse
 import astropy.time
 import dateutil.parser
 import math
+
+
 
 from matplotlib.ticker import MultipleLocator, FormatStrFormatter
 
@@ -171,9 +172,8 @@ INTRODUCTION = '''GPS:
 '''
 
 EXAMPLE = '''EXAMPLES:
-    download_gps_def.py search_gps.txt -d 20150101
-    download_gps_def.py search_gps.txt -d 20150101,20150203
-    download_gps_def.py search_gps.txt -datetxt /Yunmeng/SCRATCH/LosAngeles.txt
+    enu2los.py station_name incidenceAngele headingAngele
+    enu2los.py BGIS 23.2 -160.4
 '''    
     
 
@@ -245,8 +245,8 @@ def main(argv):
     
     YYYY = YYYY.astype(np.float)
     JMD = JMD.astype(np.float)
-    Def_LOS = Def_LOS.astype(np.float)
-    Sig_LOS = Sig_LOS.astype(np.float)
+    #Def_LOS = Def_LOS.astype(np.float)
+    #Sig_LOS = Sig_LOS.astype(np.float)
     
     np.savetxt('t1',YYYY);
     np.savetxt('t2',JMD);
