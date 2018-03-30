@@ -16,10 +16,10 @@ Usage Example:
 step 1: search_gps_pysar.py (see usage)
 
 step 2: 
-       (troposhere products)                    (ground deformation products)
-       download_gps_atm.py date_list            download_gps_def.py date_list
-       get_sar_atm.py (see usage)               enu2los_all.py (see usage)
-                                                get_sar_def.py (see usage) 
-       
 
+download_gps_atm.py            
+get_sar_atm.py 
 
+download_gps_def.py
+enu2los_all.py
+get_sar_def.py
