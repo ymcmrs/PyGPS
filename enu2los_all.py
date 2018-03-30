@@ -215,8 +215,8 @@ def main(argv):
         Nm =str(GPS_Nm[i])
         print_progress(i+1, N, prefix='Station name: ', suffix=Nm)
         if k_flag==0:
-            INC = GPS[i,5]
-            HEAD = GPS[i,6]
+            INC = GPS[i,6]
+            HEAD = GPS[i,7]
         
         call_str = 'enu2los.py ' + Nm + ' ' + str(INC) + ' ' + str(HEAD)
         os.system(call_str)
