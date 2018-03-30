@@ -171,9 +171,10 @@ INTRODUCTION = '''GPS:
 '''
 
 EXAMPLE = '''EXAMPLES:
-    download_gps_def.py search_gps.txt -d 20150101
-    download_gps_def.py search_gps.txt -d 20150101,20150203
-    download_gps_def.py search_gps.txt -datetxt /Yunmeng/SCRATCH/LosAngeles.txt
+
+    download_gps_def.py search_gps.txt 
+    download_gps_def.py gps_geometry.txt 
+
 '''    
     
 
