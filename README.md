@@ -10,15 +10,3 @@ Incorporate GPS and InSAR based on python both for deformation estimation, atmos
      
 Yunmeng
 May 16, 2017
-
-Usage Example:
-
-step 1: search_gps_pysar.py (see usage)
-
-step 2:(atm&def)
-download_gps_atm.py            
-get_sar_atm.py 
-
-download_gps_def.py
-enu2los_all.py
-get_sar_def.py
