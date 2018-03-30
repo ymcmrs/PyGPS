@@ -157,8 +157,8 @@ INTRODUCTION = '''GPS:
 
 EXAMPLE = '''EXAMPLES:
 
-    get_research_atm_date.py --station station
-    get_research_atm_date.py --station_txt search_gps.txt
+    get_research_atm_date.py 20150101 --station station
+    get_research_atm_date.py 20150101 --station_txt search_gps.txt
     
 '''    
     
