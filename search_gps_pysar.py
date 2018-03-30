@@ -151,7 +151,7 @@ EXAMPLE = '''EXAMPLES:
     search_gps_pysar.py -b 120/122/34/38
     search_gps_pysar.py -f unwrapIfgram.h5 -s 20100102 -o gps_LosAngeles.txt
     search_gps_pysar.py -f demGeo.h5 -s 20100102 --inside -o gps_LosAngeles.txt
-    
+    search_gps_pysar.py -f demGeo.h5 -s 20100102 --extend_search 0.1 -o gps_LosAngeles.txt
 '''
 
 
@@ -166,6 +166,7 @@ def cmdLineParse():
     parser.add_argument('-e', dest='end', help='end date.')
     parser.add_argument('-o', dest='out', help='output file name.')
     parser.add_argument('--inside', action="store_true", default=False, help='Constraining stations inside the SAR coverage, otherwise, in the corner rectangle region.')
+    parser.add_argument('--extend_search', dest='extend_search', help='extend the search region based on the box corner.')
     
     inps = parser.parse_args()
     
@@ -256,6 +257,14 @@ def main(argv):
     MaxLat = max(LAT)
     MinLon = min(LON)
     MaxLon = max(LON)
+    
+    if inps.extend_search:
+        dx = float(inps.extend_search)
+        MinLat = MinLat - dx
+        MaxLat = MaxLat + dx
+        MinLon = MinLon - dx
+        MaxLon = MaxLon + dx
+        
     
     if ((MinLon < 0) and (MaxLon < 0 ) ):
         MinLon = MinLon + 360
