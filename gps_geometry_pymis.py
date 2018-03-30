@@ -166,6 +166,8 @@ def main(argv):
     GPS_Nm = GPS_Nm.tolist()
     GPS_LAT = GPS[:,1]
     GPS_LON = GPS[:,2]
+    GPS_HEI = GPS[:,3]
+
     N = len(GPS_Nm)     
     
     
@@ -175,6 +177,7 @@ def main(argv):
     for i in range(N):
         LAT = GPS_LAT[i]
         LON = str(float(GPS_LON[i])-360)
+        HEI = GPS_HEI[i]
         NM =GPS_Nm[i]
         XX = int (( float(LAT) - float(Corner_LAT) ) / float(post_Lat))  # latitude   width   range
         YY = int (( float(LON) - float(Corner_LON) ) / float(post_Lon))  # longitude   nline  azimuth
@@ -189,7 +192,7 @@ def main(argv):
             HEAD = DATA_HEAD[Azimuth][Range]
     
  
-        STR = str(NM) + ' ' + str(float(LAT)) + ' ' + str(float(LON)) + ' ' + str(Azimuth) + ' ' + str(Range) + ' '  + str(INC) + ' ' + str(HEAD) 
+        STR = str(NM) + ' ' + str(float(LAT)) + ' ' + str(float(LON)) + ' ' + str(float(HEI)) + ' '  + str(Azimuth) + ' ' + str(Range) + ' '  + str(INC) + ' ' + str(HEAD) 
         call_str = 'echo ' + STR + ' >> ' + OUT
         os.system(call_str)
         
