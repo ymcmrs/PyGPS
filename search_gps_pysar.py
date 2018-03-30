@@ -225,6 +225,9 @@ def main(argv):
     
     call_str = "awk '{print $3}' tt >t_Lon"
     os.system(call_str)
+    
+    call_str = "awk '{print $4}' tt >t_Height"
+    os.system(call_str)
 
     call_str = "awk '{print $8}' tt >t_Dbeg"
     os.system(call_str)
@@ -240,10 +243,13 @@ def main(argv):
     P_Lon = np.loadtxt('t_Lon')
     P_Lon = np.asarray(P_Lon)
     
+    P_Height = np.loadtxt('t_Height')
+    P_Height = np.asarray(P_Height)
+    
     P_Dbeg = np.loadtxt('t_Dbeg',dtype = np.str)
     P_Dend = np.loadtxt('t_Dend',dtype = np.str)
     
-    rm('t_Lat'),rm('t_Lon'),rm('t_Dbeg'),rm('t_Name'),rm('DataHoldings.txt'),rm('t_Dend'),rm('tt')
+    rm('t_Lat'),rm('t_Lon'),rm('t_Dbeg'),rm('t_Name'),rm('DataHoldings.txt'),rm('t_Dend'),rm('tt'),tm('t_height')
     
 
     MinLat = min(LAT)
@@ -311,7 +317,7 @@ def main(argv):
     else:
         print 'Number of available GPS station:  %s' % str(x)
         print ''
-        print '  Station Name      Lat(deg)      Long(deg)       Date_beg      Date_end  '
+        print '  Station Name      Lat(deg)      Long(deg)       Height(m)      Date_beg      Date_end  '
     
  
     if os.path.isfile(OUT):
@@ -327,10 +333,11 @@ def main(argv):
         Nm = P_Name[kk[i]]
         LAT = P_Lat[kk[i]]
         LON = P_Lon[kk[i]]
+        HEI = P_Height[kk[i]]
         DB = P_Dbeg[kk[i]] 
         DE = P_Dend[kk[i]]
         #call_str = 'echo ' + str(Nm) + ' ' + str(LAT) + ' ' + str(LON)   + ' ' + str(DB) + ' ' + str(DE) + ' ' + str(TS) + ' ' + str(INC) + ' ' + str(HEAD) + ' >> ' + OUT
-        call_str = 'echo ' + str(Nm) + ' ' + str(LAT) + ' ' + str(LON)   + ' ' + str(DB) + ' ' + str(DE) + ' >> ' + OUT
+        call_str = 'echo ' + str(Nm) + ' ' + str(LAT) + ' ' + str(LON)   + ' '+ str(HEI) + ' '  + str(DB) + ' ' + str(DE) + ' >> ' + OUT
         #call_str = 'echo ' + str(Nm) + ' ' + str(LAT) + ' ' + str(LON)   + ' ' + str(DB) + ' ' + str(DE) + ' >> ' + OUT
         os.system(call_str)
         
@@ -342,7 +349,7 @@ def main(argv):
         
         call_str = 'echo '  + str(LON) +' ' + str(LAT) + ' ' + str(Nm)  + ' >> ' + PSTEXT
         os.system(call_str)
-        print '     ' + str(Nm) + '           ' + str(LAT) + '       ' + str(LON) + '       ' + str(DB) + '     ' + str(DE) 
+        print '     ' + str(Nm) + '           ' + str(LAT) + '       ' + str(LON) +'       ' + str(HEI) + '       ' + str(DB) + '     ' + str(DE) 
         
                
 if __name__ == '__main__':
