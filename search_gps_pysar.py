@@ -206,11 +206,6 @@ def main(argv):
     if inps.inside:
         OUT = 'search_gps_inside.txt'
         
-    if inps.out:
-        OUT = inps.out
-   
-       
-    
     
     call_str = 'wget -q http://geodesy.unr.edu/NGLStationPages/DataHoldings.txt'
     os.system(call_str)
@@ -258,13 +253,18 @@ def main(argv):
     MinLon = min(LON)
     MaxLon = max(LON)
     
+    VP1 = [[MinLat,MaxLon],[MinLat,MinLon],[MaxLat,MinLon],[MaxLat,MaxLon],[MinLat,MaxLon]]
+    
     if inps.extend_search:
         dx = float(inps.extend_search)
         MinLat = MinLat - dx
         MaxLat = MaxLat + dx
         MinLon = MinLon - dx
         MaxLon = MaxLon + dx
-        
+        OUT = 'search_gps_extend.txt'
+    if inps.out:
+        OUT = inps.out
+   
     
     if ((MinLon < 0) and (MaxLon < 0 ) ):
         MinLon = MinLon + 360
@@ -305,19 +305,33 @@ def main(argv):
         
     x = len(kk)
     kk_mod = []
+    kk_flag = []
     
     for i in range(x):
         dt1 = float_yyyymmdd(P_Dbeg[kk[i]])
         dt2 = float_yyyymmdd(P_Dend[kk[i]])
         if (dt1 > date1 and dt1 < date2) or (dt2 > date1 and dt2 < date2) or ( dt1<date1 and date2 < dt2):
             k_flag = 1
+            LA0 = P_Lat[kk[i]];LO0  = P_Lon[kk[i]]
+            PP0 = [float(LA0),float(LO0)-360];
+            #print PP0
+            k_inside = cn_PnPoly(PP0, VP)
+            k_out_corner = cn_PnPoly(PP0, VP1)
+            
+            if k_inside==1:
+                k0 = 1
+            elif k_out_corner==1:
+                k0 = 3
+            else:
+                k0 = 2                
+            
             if inps.inside:
-                LA0 = P_Lat[kk[i]];LO0  = P_Lon[kk[i]]
-                PP0 = [float(LA0),float(LO0)-360];
-                #print PP0
-                k_flag = cn_PnPoly(PP0, VP)
+                k_flag = k_inside
             if k_flag==1:            
                 kk_mod.append(kk[i])
+                kk_flag.append(k0)
+                
+                
     
     kk = kk_mod
     x = len(kk)
@@ -345,8 +359,9 @@ def main(argv):
         HEI = P_Height[kk[i]]
         DB = P_Dbeg[kk[i]] 
         DE = P_Dend[kk[i]]
+        flag0 = kk_flag[i]
         #call_str = 'echo ' + str(Nm) + ' ' + str(LAT) + ' ' + str(LON)   + ' ' + str(DB) + ' ' + str(DE) + ' ' + str(TS) + ' ' + str(INC) + ' ' + str(HEAD) + ' >> ' + OUT
-        call_str = 'echo ' + str(Nm) + ' ' + str(LAT) + ' ' + str(LON)   + ' '+ str(HEI) + ' '  + str(DB) + ' ' + str(DE) + ' >> ' + OUT
+        call_str = 'echo ' + str(Nm) + ' ' + str(LAT) + ' ' + str(LON)   + ' '+ str(HEI) + ' '  + str(DB) + ' ' + str(DE) +  ' ' + str(int(flag0)) + ' >> ' + OUT
         #call_str = 'echo ' + str(Nm) + ' ' + str(LAT) + ' ' + str(LON)   + ' ' + str(DB) + ' ' + str(DE) + ' >> ' + OUT
         os.system(call_str)
         
@@ -358,7 +373,7 @@ def main(argv):
         
         call_str = 'echo '  + str(LON) +' ' + str(LAT) + ' ' + str(Nm)  + ' >> ' + PSTEXT
         os.system(call_str)
-        print '     ' + str(Nm) + '           ' + str(LAT) + '       ' + str(LON) +'       ' + str(HEI) + '       ' + str(DB) + '     ' + str(DE) 
+        print '     ' + str(Nm) + '           ' + str(LAT) + '       ' + str(LON) +'       ' + str(HEI) + '       ' + str(DB) + '     ' + str(DE) + ' ' +str(int(flag0))
         
                
 if __name__ == '__main__':
