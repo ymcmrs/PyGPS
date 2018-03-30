@@ -220,7 +220,7 @@ def main(argv):
         if os.path.isfile(OUT):
             os.remove(OUT)
             
-        if not os.path.isfile:
+        if not os.path.isfile(Research_File):
             call_str =  'get_research_atm_date.py ' + DATE0 + ' --station_txt ' + TXT
             os.system(call_str)
                 
