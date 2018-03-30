@@ -249,7 +249,7 @@ def main(argv):
     P_Dbeg = np.loadtxt('t_Dbeg',dtype = np.str)
     P_Dend = np.loadtxt('t_Dend',dtype = np.str)
     
-    rm('t_Lat'),rm('t_Lon'),rm('t_Dbeg'),rm('t_Name'),rm('DataHoldings.txt'),rm('t_Dend'),rm('tt'),tm('t_height')
+    rm('t_Lat'),rm('t_Lon'),rm('t_Dbeg'),rm('t_Name'),rm('DataHoldings.txt'),rm('t_Dend'),rm('tt'),rm('t_height')
     
 
     MinLat = min(LAT)
