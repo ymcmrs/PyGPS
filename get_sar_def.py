@@ -217,6 +217,7 @@ def main(argv):
         sum0 = 0
         for j in range(N_GPS):
             GPS0 = GPS_Nm[j] + '_TS_LOS'
+            NM0 = GPS0[0:4]
             DATA = np.loadtxt(GPS0, dtype = np.str)
             YYYY = DATA[:,0]
             YYYY = YYYY.astype(np.float)
@@ -249,7 +250,7 @@ def main(argv):
                 LOS = str(LOS)
                 MAE = str(MAE)
                 
-                call_str = 'echo ' + GPS0 + ' ' + LOS + ' ' + MAE + ' ' + SIG + ' >>' + OUT
+                call_str = 'echo ' + NM0 + ' ' + LOS + ' ' + MAE + ' ' + SIG + ' >>' + OUT
                 os.system(call_str)
         print DATE0  + '( MJD '+ str(int(MJD))+ ')' +': ' + str(int(sum0)) + ' stations available'
         
