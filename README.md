@@ -8,7 +8,18 @@ Incorporate GPS and InSAR based on python both for deformation estimation, atmos
 4. Develop new algorithms for incorporating GPS and InSAR  ( ing... )           
 #######################################################################################    
      
-  
-
 Yunmeng
 May 16, 2017
+
+Usage Example:
+
+step 1: search_gps_pysar.py (see usage)
+
+step 2: 
+       (troposhere products)                    (ground deformation products)
+       download_gps_atm.py date_list            download_gps_def.py date_list
+       get_sar_atm.py (see usage)               enu2los_all.py (see usage)
+                                                get_sar_def.py (see usage) 
+       
+
+
