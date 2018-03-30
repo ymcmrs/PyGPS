@@ -156,9 +156,9 @@ INTRODUCTION = '''GPS:
 '''
 
 EXAMPLE = '''EXAMPLES:
-    download_gps_atm.py search_gps.txt -d 20150101
-    download_gps_atm.py search_gps.txt -d 20150101,20150203
-    download_gps_atm.py search_gps.txt -datetxt /Yunmeng/SCRATCH/LosAngeles.txt
+
+    download_gps_atm.py date_list
+
 '''    
     
 
@@ -168,9 +168,8 @@ def cmdLineParse():
                                      formatter_class=argparse.RawTextHelpFormatter,\
                                      epilog=INTRODUCTION+'\n'+EXAMPLE)
 
-    parser.add_argument('gps_txt',help='Available GPS station information.')
-    parser.add_argument('-d', dest='time', help='SAR acquisition time.')
-    parser.add_argument('--datetxt', dest='datetxt', help='text file of date for downloading.')
+    parser.add_argument('date_list',help='Date list for downloading trop list.')
+
     
     inps = parser.parse_args()
 
@@ -181,178 +180,16 @@ def cmdLineParse():
 def main(argv):
     
     inps = cmdLineParse()
+    LIST = inps.date_list
+    DATE = np.loadtxt(LIST,dtype=np.str)
+    DATE = DATE.tolist()
+    N=len(DATE)
     
-    TXT = inps.gps_txt
-    GPS= np.loadtxt(TXT, dtype = np.str)
-    GPS_Nm =GPS[:,0]
-    GPS_LAT = GPS[:,1]
-    GPS_LON = GPS[:,2]
-    GPS_Nm = GPS_Nm.tolist()
-    
-    Thelta = float(GPS[0,6])
-    HEAD = float(GPS[0,7])
-    
-    pi = math.pi
-    Thelta = Thelta/180*pi
-    
-    N = len(GPS_Nm) 
-    t0 = GPS[0,5]
-    t0 =float(t0)/3600/24
-    t0 = float(t0)*24*12
-    t0 = round(t0)
-    t0 = t0 * 300
-    
-    Tm =str(int(t0))
-    
-    if inps.time:
-        DATESTR = inps.time
-        DD=readdate(DATESTR)
-        k = len(DD)
-    else:
-        DATETXT = inps.datetxt
-        DD = np.loadtxt(DATETXT)
-        k = DD.size
-        AA =[]
-        if k ==1:
-            AA.append(str(int(DD)))
-        else:
-            for i in range(k):
-                AA.append(str(int(DD[i])))
-        DD = AA
-        
-    print ''
-    print "Downloaded date: "
-    print DD
-    
-    
-    SST = yyyy2yyyymmddhhmmss(float(t0))
-    
-    for i in range(k):       
-        DATE = str(int(DD[i]))
-        print_progress(i+1, k, prefix='Downloading GPS ZTD for acquisition:  ', suffix=DATE)
-        
-        DATE = unitdate(DATE)
-        dt = dateutil.parser.parse(DATE)
-        time = astropy.time.Time(dt)
-        JD = time.jd - 2451545.0
-        JDSEC = JD*24*3600
-    
-        print ''
-        print "SAR acquisition time (UTC) is: " +DATE[0:4] + ' ' + DATE[4:6] + ' ' +DATE[6:8] + ' ' + SST
-        JDSEC_SAR = int(JDSEC + t0)
-        print "SAR acquisition time (J2000) is: " + str(JDSEC_SAR) + ' (SEC)'
-        print ''
-        
-        ST = yyyymmdd2yyyydd(DATE)
-        
-        YEAR = ST[0:4]
-        DAY = ST[4:]      
-    
-    
-        #######################  search the biggest one to download ################################
-        call_str = 'curl ftp://data-out.unavco.org/pub/products/troposphere/' + YEAR + '/' + DAY + '/' + ' >ttt' 
+    for i in range(N):
+        DATE0 = DATE[i]  
+        call_str = 'download_gps_atm_date.py ' + DATE0
         os.system(call_str)
-    
-        call_str ="grep 'cwu' ttt > ttt1"
-        os.system(call_str)
-    
-        call_str ="grep '.gz' ttt1 > ttt"
-        os.system(call_str)
-        BB = np.loadtxt('ttt',dtype=np.str)
-    
-    
-        call_str = "awk '{print $5}' ttt >ttt1"
-        os.system(call_str)
-    
-        AA = np.loadtxt('ttt1')
-        kk = AA.size
-    
-        if kk>1:
-            AA = map(int,AA)
-            IDX = AA.index(max(AA))
-            FILE = BB[int(IDX),8]
-        else:
-            AA = int(AA)
-            FILE = BB[8]
-    
-    
-        if os.path.isfile(FILE):
-            os.remove(FILE)
-    
-        call_str = 'wget -q ftp://data-out.unavco.org/pub/products/troposphere/' + YEAR + '/' + DAY + '/' + FILE
-        print call_str
-        print 'Downloading GPS troposphere data >>> '
-        os.system(call_str)
-        print 'Download finish.'
-        print ''
-    
-        print 'Start to get ZTD data in SAR coverage >>>'
-        FILE0 = FILE.replace('.gz','')
-        if os.path.isfile(FILE0):
-            os.remove(FILE0)
-
-        call_str = 'gzip -d ' + FILE
-        os.system(call_str)
-    
-        OUT = 'gps_atm_raw_'+unitdate(str(DD[i]))
-    
-        if os.path.isfile(OUT):
-            os.remove(OUT)    
-    
-        Tm = str(JDSEC_SAR)
-    
-        print '...'
-        for j in range(N):
-            Nm=GPS_Nm[j]
-            call_str = "grep " + Nm + ' ' + FILE0 + '> tt'
-            os.system(call_str)
-        
-            call_str = "grep " + Tm + ' tt ' + '>> ' + OUT
-            os.system(call_str)
-        
-        
-        RAW_ATM = np.loadtxt(OUT, dtype = np.str)
-        ZTD = RAW_ATM[:,1]
-        ZDD = RAW_ATM[:,2]
-        ZWD = RAW_ATM[:,3]
-        ZWD_SIG = RAW_ATM[:,4]
-        
-        N0 = len(ZTD)
-        if N0 == 1:
-            ZTD_LOS = float(ZTD)/math.cos(Thelta)
-            ZDD_LOS = float(ZDD)/math.cos(Thelta)
-            ZWD_LOS = float(ZWD)/math.cos(Thelta)
-            ZWD_SIG_LOS = float(ZWD_SIG)/math.cos(Thelta)
             
-        else:
-            ZTD = map(float,ZTD)
-            ZDD = map(float,ZDD)
-            ZWD = map(float,ZWD)
-            ZWD_SIG = map(float,ZWD_SIG)
-            
-            ZTD_LOS = np.divide(ZTD,math.cos(Thelta))
-            ZDD_LOS = np.divide(ZDD,math.cos(Thelta))
-            ZWD_LOS = np.divide(ZWD,math.cos(Thelta))
-            ZWD_SIG_LOS = np.divide(ZWD_SIG,math.cos(Thelta))
-
-        NM = RAW_ATM[:,9]
-                
-        OUT = 'gps_atm_los_' + unitdate(str(DD[i]))
-        if os.path.isfile(OUT):
-            os.remove(OUT) 
-                    
-        for j in range(N0):
-            LAT = GPS_LAT[GPS_Nm.index(NM[j])]
-            LON = GPS_LON[GPS_Nm.index(NM[j])]
-            STR = str(NM[j]) + ' ' + str(LAT) + ' ' + str(LON) + ' ' + str(ZTD_LOS[j]) + ' ' +str(ZDD_LOS[j]) + ' ' + str(ZWD_LOS[j]) + ' ' + str(ZWD_SIG_LOS[j])
-            call_str = 'echo ' + STR + '>> ' + OUT
-            os.system(call_str)
-                
-        count = len(open(OUT,'rU').readlines())
-        print ''
-        print 'Number of available GPS stations with ZTD data at SAR acquisition: ' + str(count)
-        print str(DD[i]) + ' Done.'
-        print ''
     
     
 
