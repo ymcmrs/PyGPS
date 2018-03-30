@@ -160,7 +160,8 @@ INTRODUCTION = '''GPS:
 
 EXAMPLE = '''EXAMPLES:
 
-    get_sar_atm.py date_list imaging_time
+    get_sar_atm.py date_list search_gps.txt imaging_time
+    get_sar_atm.py date_list gps_geometry.txt imaging_time
 
 '''    
     
@@ -172,6 +173,7 @@ def cmdLineParse():
                                      epilog=INTRODUCTION+'\n'+EXAMPLE)
 
     parser.add_argument('date_list',help='Date list for downloading trop list.')
+    parser.add_argument('gps_txt',help='GPS station text file.')
     parser.add_argument('imaging_time',help='Center line UTC.')
     
     inps = parser.parse_args()
@@ -187,6 +189,7 @@ def main(argv):
     DATE = np.loadtxt(LIST,dtype=np.str)
     DATE = DATE.tolist()
     N=len(DATE)
+    TXT =inps.gps_txt
     
     t0 = inps.imaging_time
     SST = yyyy2yyyymmddhhmmss(float(t0))
@@ -218,7 +221,7 @@ def main(argv):
             os.remove(OUT)
             
         if not os.path.isfile:
-            call_str =  'get_research_atm_date.py ' + DATE0 + ' --station_txt search_gps_inside.txt'
+            call_str =  'get_research_atm_date.py ' + DATE0 + ' --station_txt ' + TXT
             os.system(call_str)
                 
         call_str = "grep " + str(JDSEC_SAR) + ' ' + Research_File + ' > ' + OUT
