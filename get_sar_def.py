@@ -160,7 +160,8 @@ INTRODUCTION = '''GPS:
 
 EXAMPLE = '''EXAMPLES:
 
-    get_sar_def.py date_list imaging_time
+    get_sar_def.py date_list search_gps.txt
+    get_sar_def.py date_list search_gps.txt --average_number 20
 
 '''    
     
