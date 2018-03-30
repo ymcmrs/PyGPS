@@ -18,6 +18,7 @@ import dateutil.parser
 
 
 
+
 def print_progress(iteration, total, prefix='calculating:', suffix='complete', decimals=1, barLength=50, elapsed_time=None):
     """Print iterations progress - Greenstick from Stack Overflow
     Call in a loop to create terminal progress bar
@@ -182,6 +183,7 @@ def cmdLineParse():
 def main(argv):
     
     inps = cmdLineParse()
+    LIST = inps.date_list
     DATE = np.loadtxt(LIST,dtype=np.str)
     DATE = DATE.tolist()
     N=len(DATE)
@@ -193,11 +195,18 @@ def main(argv):
     t0 = round(t0)
     t0 = t0 * 300
     
+    Tm =str(int(t0))
+    
     for i in range(N):
         
         DATE0 = unitdate(DATE[i])
-        Research_File = 'Research_GPS_Trop_'+DATE0
+        dt = dateutil.parser.parse(DATE0)
+        time = astropy.time.Time(dt)
+        JD = time.jd - 2451545.0
+        JDSEC = JD*24*3600
         
+        Research_File = 'Research_GPS_Trop_'+DATE0
+       
         print ''
         print "SAR acquisition time (UTC) is: " +DATE0[0:4] + ' ' + DATE0[4:6] + ' ' +DATE0[6:8] + ' ' + SST
         JDSEC_SAR = int(JDSEC + t0)
@@ -212,8 +221,8 @@ def main(argv):
             call_str =  'get_research_atm_date.py ' + DATE0 + ' --station_txt search_gps_inside.txt'
             os.system(call_str)
                 
-            call_str = "grep " + Tm + ' ' + Research_File + ' >> ' + OUT
-            os.system(call_str)
+        call_str = "grep " + str(JDSEC_SAR) + ' ' + Research_File + ' > ' + OUT
+        os.system(call_str)
                
 
 if __name__ == '__main__':
