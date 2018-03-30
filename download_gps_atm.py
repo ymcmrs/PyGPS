@@ -184,6 +184,10 @@ def main(argv):
     DATE = np.loadtxt(LIST,dtype=np.str)
     DATE = DATE.tolist()
     N=len(DATE)
+    call_str = 'mkdir GPS_ATM'
+    os.system(call_str)
+    
+    os.chdir('GPS_ATM')
     
     for i in range(N):
         DATE0 = DATE[i]  
