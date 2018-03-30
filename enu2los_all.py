@@ -197,7 +197,7 @@ def cmdLineParse():
 def main(argv):
     
     inps = cmdLineParse()
-    GPS = inps.gps_geometry_file
+    GPS = inps.gps_file
     GPS= np.loadtxt(TXT, dtype = np.str)
     GPS_Nm =GPS[:,0]
     GPS_Nm = GPS_Nm.tolist()
