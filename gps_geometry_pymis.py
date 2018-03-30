@@ -167,6 +167,8 @@ def main(argv):
     GPS_LAT = GPS[:,1]
     GPS_LON = GPS[:,2]
     GPS_HEI = GPS[:,3]
+    GPS_FLAG = GPS[:,6]
+    
 
     N = len(GPS_Nm)     
     
@@ -181,18 +183,38 @@ def main(argv):
         NM =GPS_Nm[i]
         XX = int (( float(LAT) - float(Corner_LAT) ) / float(post_Lat))  # latitude   width   range
         YY = int (( float(LON) - float(Corner_LON) ) / float(post_Lon))  # longitude   nline  azimuth
-             
-        CPX_OUT = data[XX][YY]    
-        Range = int(CPX_OUT.real)
-        Azimuth = int(CPX_OUT.imag)
         
-        if os.path.isfile(inps.inc):
-            INC = DATA_INC[Azimuth][Range]
-        if os.path.isfile(inps.head):
-            HEAD = DATA_HEAD[Azimuth][Range]
-    
+        flag0=int(GPS_FLAG[i])
+        
+        if ((not flag0==3) and XX<int(nLineUTM) and XX>0 and YY<int(nWidthUTM)):    
+            CPX_OUT = data[XX][YY]    
+            Range = int(CPX_OUT.real)+1
+            Azimuth = int(CPX_OUT.imag)+1
+            
+            if os.path.isfile(inps.inc):
+                if flag0==1:
+                    INC = DATA_INC[Azimuth][Range]
+                else:
+                    INC ='9999'
+            else:
+                INC = inps.inc
+            
+            if os.path.isfile(inps.head):
+                if flag0==1:
+                    HEAD = DATA_HEAD[Azimuth][Range]
+                else:
+                    HEAD = '9999'
+            else:
+                HEAD =inps.head
+                    
+        else:
+            
+            Range = '9999'
+            Azimuth = '9999'
+            INC = '9999'
+            HEAD = '9999'
  
-        STR = str(NM) + ' ' + str(float(LAT)) + ' ' + str(float(LON)) + ' ' + str(float(HEI)) + ' '  + str(Azimuth) + ' ' + str(Range) + ' '  + str(INC) + ' ' + str(HEAD) 
+        STR = str(NM) + ' ' + str(float(LAT)) + ' ' + str(float(LON)) + ' ' + str(float(HEI)) + ' '  + str(Azimuth) + ' ' + str(Range) + ' '  + str(INC) + ' ' + str(HEAD) + ' ' + str(int(flag0)) 
         call_str = 'echo ' + STR + ' >> ' + OUT
         os.system(call_str)
         
