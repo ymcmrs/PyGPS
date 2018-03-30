@@ -185,7 +185,7 @@ def cmdLineParse():
                                      epilog=INTRODUCTION+'\n'+EXAMPLE)
 
     parser.add_argument('gps_file',help='GPS station file. geometry or general')
-    parser.add_argument('--inc', dest='incidence', help='incidence angle for deformation change.')
+    parser.add_argument('--inc', dest='inc', help='incidence angle for deformation change.')
     parser.add_argument('--head', dest='head', help='Heading angle for deformation change.')
     
     inps = parser.parse_args()
