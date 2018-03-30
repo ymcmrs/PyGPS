@@ -107,6 +107,8 @@ def yyyymmdd2yyyydd(DATE):
     return ST
 
 def yyyy2yyyymmddhhmmss(t0):
+    
+    t0 = float(t0)/3600/24
     hh = int(t0*24)
     mm = int((t0*24 - int(t0*24))*60)
     ss = (t0*24*60 - int(t0*24*60))*60
@@ -157,7 +159,7 @@ INTRODUCTION = '''GPS:
 
 EXAMPLE = '''EXAMPLES:
 
-    get_researcb_atm.py date_list gps_research.txt
+    get_sar_atm.py date_list imaging_time
 
 '''    
     
@@ -169,7 +171,7 @@ def cmdLineParse():
                                      epilog=INTRODUCTION+'\n'+EXAMPLE)
 
     parser.add_argument('date_list',help='Date list for downloading trop list.')
-    parser.add_argument('station_txt',help='Station txt for downloading trop list.')
+    parser.add_argument('imaging_time',help='Center line UTC.')
     
     inps = parser.parse_args()
 
@@ -180,20 +182,39 @@ def cmdLineParse():
 def main(argv):
     
     inps = cmdLineParse()
-    LIST = inps.date_list
     DATE = np.loadtxt(LIST,dtype=np.str)
     DATE = DATE.tolist()
     N=len(DATE)
     
-    TXT =inps.station_txt
+    t0 = inps.imaging_time
+    SST = yyyy2yyyymmddhhmmss(float(t0))
+    t0 =float(t0)/3600/24
+    t0 = float(t0)*24*12
+    t0 = round(t0)
+    t0 = t0 * 300
+    
     for i in range(N):
-        DATE0 = DATE[i]
-        print 'Get research tropospheric data >>> ' + DATE0
-        call_str = 'get_research_atm_date.py ' + DATE0 + ' --station_txt ' + TXT
-        os.system(call_str)
+        
+        DATE0 = unitdate(DATE[i])
+        Research_File = 'Research_GPS_Trop_'+DATE0
+        
+        print ''
+        print "SAR acquisition time (UTC) is: " +DATE0[0:4] + ' ' + DATE0[4:6] + ' ' +DATE0[6:8] + ' ' + SST
+        JDSEC_SAR = int(JDSEC + t0)
+        print "SAR acquisition time (J2000) is: " + str(JDSEC_SAR) + ' (SEC)'
+        print ''
+        
+        OUT = 'SAR_GPS_Trop_' + DATE0
+        if os.path.isfile(OUT):
+            os.remove(OUT)
             
-    
-    
+        if not os.path.isfile:
+            call_str =  'get_research_atm_date.py ' + DATE0 + ' --station_txt search_gps_inside.txt'
+            os.system(call_str)
+                
+            call_str = "grep " + Tm + ' ' + Research_File + ' >> ' + OUT
+            os.system(call_str)
+               
 
 if __name__ == '__main__':
     main(sys.argv[1:])
