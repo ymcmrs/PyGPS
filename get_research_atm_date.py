@@ -197,58 +197,10 @@ def main(argv):
     Trop_GPS = 'Global_GPS_Trop_' + DATE 
     OUT = 'Research_GPS_Trop_' + DATE 
     
-    call_str = 'curl ftp://data-out.unavco.org/pub/products/troposphere/' + YEAR + '/' + DAY + '/' + ' >ttt' 
-    os.system(call_str)
-    
-    call_str ="grep 'cwu' ttt > ttt1"
-    os.system(call_str)
-    
-    call_str ="grep '.gz' ttt1 > ttt"
-    os.system(call_str)
-    BB = np.loadtxt('ttt',dtype=np.str)
-    
-    
-    call_str = "awk '{print $5}' ttt >ttt1"
-    os.system(call_str)
-    
-    AA = np.loadtxt('ttt1')
-    kk = AA.size
-    
-    if kk>1:
-        AA = map(int,AA)
-        IDX = AA.index(max(AA))
-        FILE = BB[int(IDX),8]
-    else:
-        AA = int(AA)
-        FILE = BB[8]
-    
-    
-    #print YEAR
-    #print DAY
-    
-    if os.path.isfile(FILE):
-        os.remove(FILE)
-    
-    call_str = 'wget -q ftp://data-out.unavco.org/pub/products/troposphere/' + YEAR + '/' + DAY + '/' + FILE
-    print 'Downloading GPS troposphere data ...'
-    os.system(call_str)
-    print 'Download finish.'
-    print ''
-    
-    FILE0 = FILE.replace('.gz','')
-    if os.path.isfile(FILE0):
-        os.remove(FILE0)
+    if not os.path.isfile(Trop_GPS):
+        call_str = 'download_gps_atm_date.py ' + DATE
+        os.system(call_str)
 
-    call_str = 'gzip -d ' + FILE
-    os.system(call_str)
-    
-    call_str ='cp ' + FILE0 + ' ' + Trop_GPS
-    os.system(call_str)
-
-    os.remove(FILE0)    
-    
-    k=0
-    
     if inps.station_name:
         DD=readdate(inps.station_name)
         k = len(DD)
@@ -257,15 +209,15 @@ def main(argv):
         DD =GPS[:,0]
         k=len(DD)
         DD = DD.tolist()
-    if k>0:
-        print 'Extracting tropospheric delays for ' + str(int(k)) + ' GPS stations:'
-        if os.path.isfile(OUT):
-            os.remove(OUT)
-        for i in range(k):
-            Nm=DD[i]
-            print_progress(i+1, k, prefix='Station name: ', suffix=Nm)
-            call_str = "grep " + Nm + ' ' + Trop_GPS + '>> ' + OUT
-            os.system(call_str)
+        
+    print 'Extracting tropospheric delays for ' + str(int(k)) + ' GPS stations:'
+    if os.path.isfile(OUT):
+        os.remove(OUT)
+    for i in range(k):
+        Nm=DD[i]
+        print_progress(i+1, k, prefix='Station name: ', suffix=Nm)
+        call_str = "grep " + Nm + ' ' + Trop_GPS + '>> ' + OUT
+        os.system(call_str)
             
     
 if __name__ == '__main__':
