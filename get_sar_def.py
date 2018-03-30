@@ -210,6 +210,8 @@ def main(argv):
         MJD = time.jd - 2400000  
         OUT = 'SAR_GPS_Def_' + DATE0
         
+        if os.path.isfile(OUT):
+            os.remove(OUT)
         MJD1 = float(MJD - N_Av)
         MJD2 = float(MJD + N_Av)
            
