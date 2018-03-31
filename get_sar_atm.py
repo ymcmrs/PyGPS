@@ -216,7 +216,8 @@ def main(argv):
         print "SAR acquisition time (J2000) is: " + str(JDSEC_SAR) + ' (SEC)'
         print ''
         
-        OUT = 'SAR_GPS_Trop_' + DATE0
+        OUT = 'SAR_GPS_Trop_RAW_' + DATE0
+        OUT2 = 'SAR_GPS_Trop_' + DATE0
         if os.path.isfile(OUT):
             os.remove(OUT)
             
@@ -226,7 +227,10 @@ def main(argv):
                 
         call_str = "grep " + str(JDSEC_SAR) + ' ' + Research_File + ' > ' + OUT
         os.system(call_str)
-               
+        
+        call_str = "awk '{print $10,$2,$3,$4,$5} ' "+ OUT + ' >' +OUT2
+        os.system(call_str)   
+            
 
 if __name__ == '__main__':
     main(sys.argv[1:])
