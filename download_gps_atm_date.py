@@ -217,6 +217,30 @@ def main(argv):
         FILE = BB[8]
     
     
+    call_str = 'curl ftp://data-out.unavco.org/pub/products/troposphere/' + YEAR + '/' + DAY + '/' + ' >ttt' 
+    os.system(call_str)
+    call_str ="grep 'nmt' ttt > ttt1"
+    os.system(call_str)
+    
+    call_str ="grep '.gz' ttt1 > ttt"
+    os.system(call_str)
+    BB = np.loadtxt('ttt',dtype=np.str)
+    
+    
+    call_str = "awk '{print $5}' ttt >ttt1"
+    os.system(call_str)
+    
+    AA = np.loadtxt('ttt1')
+    kk = AA.size
+    
+    if kk>1:
+        AA = map(int,AA)
+        IDX = AA.index(max(AA))
+        FILE_PWV = BB[int(IDX),8]
+    else:
+        AA = int(AA)
+        FILE_PWV = BB[8]
+    
     #print YEAR
     #print DAY
     
@@ -225,6 +249,13 @@ def main(argv):
     
     call_str = 'wget -q ftp://data-out.unavco.org/pub/products/troposphere/' + YEAR + '/' + DAY + '/' + FILE
     print 'Downloading GPS troposphere data ...'
+    os.system(call_str)
+    print 'Download finish.'
+    print ''
+    
+    
+    call_str = 'wget -q ftp://data-out.unavco.org/pub/products/troposphere/' + YEAR + '/' + DAY + '/' + FILE_PWV
+    print 'Downloading GPS PWV data ...'
     os.system(call_str)
     print 'Download finish.'
     print ''
@@ -240,6 +271,23 @@ def main(argv):
     os.system(call_str)
 
     os.remove(FILE0)    
+    
+    
+    
+    Trop_PWV_GPS = 'Global_GPS_PWV_' + DATE
+    
+    FILE0 = FILE_PWV.replace('.gz','')
+    if os.path.isfile(FILE0):
+        os.remove(FILE0)
+
+    call_str = 'gzip -d ' + FILE_PWV
+    os.system(call_str)
+    
+    call_str ='cp ' + FILE0 + ' ' + Trop_PWV_GPS
+    os.system(call_str)
+
+    os.remove(FILE0)    
+    
     
     k=0
     
@@ -260,7 +308,11 @@ def main(argv):
             call_str = "grep " + Nm + ' ' + Trop_GPS + '> ' + OUT
             os.system(call_str)
             
-    
+            OUT = Nm+ '_Trop_PWV_' + DATE
+            call_str = "grep " + Nm + ' ' + Trop_PWV_GPS + '> ' + OUT
+            os.system(call_str)
+            
+            
 if __name__ == '__main__':
     main(sys.argv[1:])
 
