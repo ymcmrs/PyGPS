@@ -210,7 +210,7 @@ def main(argv):
         JDSEC = JD*24*3600
         
         Research_File = 'Research_GPS_Trop_'+DATE0
-       
+        Research_File_PWV = 'Research_GPS_PWV_'+DATE0
         print ''
         print "SAR acquisition time (UTC) is: " +DATE0[0:4] + ' ' + DATE0[4:6] + ' ' +DATE0[6:8] + ' ' + SST
         JDSEC_SAR = int(JDSEC + t0)
@@ -234,7 +234,7 @@ def main(argv):
         OUT2 = 'SAR_GPS_PWV_' + DATE0
         STR_HH = " " + str(HH0) + " "
         print 'UTC: (Hour) ' + str(HH0) + ' (PWV constant will be used)'
-        call_str = "grep " + STR_HH + ' ' + Research_File + ' > ' + OUT
+        call_str = "grep " + STR_HH + ' ' + Research_File_PWV + ' > ' + OUT
         os.system(call_str)
         
         call_str = "awk '{print $18,$7,$9} ' "+ OUT + ' >' +OUT2
