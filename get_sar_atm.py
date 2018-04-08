@@ -230,11 +230,12 @@ def main(argv):
         os.system(call_str)
         
         
+        print 'UTC: (Hour) ' + str(HH0) + ' (PWV constant will be used)'
+        
         OUT = 'SAR_GPS_PWV_RAW_' + DATE0
         OUT2 = 'SAR_GPS_PWV_' + DATE0
-        STR_HH = " " + str(HH0) + " "
-        print 'UTC: (Hour) ' + str(HH0) + ' (PWV constant will be used)'
-        call_str = "grep " + STR_HH + ' ' + Research_File_PWV + ' > ' + OUT
+        STR_HH = ' ' + str(HH0) + ' '
+        call_str = "grep ' " + str(HH0) + " ' " + Research_File_PWV + " > " + OUT
         os.system(call_str)
         
         call_str = "awk '{print $18,$7,$9} ' "+ OUT + ' >' +OUT2
