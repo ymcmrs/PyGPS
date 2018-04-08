@@ -218,6 +218,18 @@ def main(argv):
         print_progress(i+1, k, prefix='Station name: ', suffix=Nm)
         call_str = "grep " + Nm + ' ' + Trop_GPS + '>> ' + OUT
         os.system(call_str)
+        
+        
+    PWV_GPS = 'Global_GPS_PWV_' + DATE   
+    OUT = 'Research_GPS_PWV_' + DATE     
+    print 'Extracting PWV for ' + str(int(k)) + ' GPS stations:'
+    if os.path.isfile(OUT):
+        os.remove(OUT)
+    for i in range(k):
+        Nm=DD[i]
+        print_progress(i+1, k, prefix='Station name: ', suffix=Nm)
+        call_str = "grep " + Nm + ' ' + PWV_GPS + '>> ' + OUT
+        os.system(call_str)
             
     
 if __name__ == '__main__':
