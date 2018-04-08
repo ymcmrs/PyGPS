@@ -221,6 +221,7 @@ def main(argv):
         OUT2 = 'SAR_GPS_Trop_' + DATE0
         if os.path.isfile(OUT):
             os.remove(OUT)
+
             
         if not os.path.isfile(Research_File):
             call_str =  'get_research_atm_date.py ' + DATE0 + ' --station_txt ' + TXT
@@ -228,6 +229,8 @@ def main(argv):
                 
         call_str = "grep " + str(JDSEC_SAR) + ' ' + Research_File + ' > ' + OUT
         os.system(call_str)
+        call_str = "awk '{print $10,$2,$3,$4} ' "+ OUT + ' >' +OUT2
+        os.system(call_str)  
         
         
         print 'UTC: (Hour) ' + str(HH0) + ' (PWV constant will be used)'
