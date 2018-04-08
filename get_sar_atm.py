@@ -198,7 +198,7 @@ def main(argv):
     t0 = float(t0)*24*12
     t0 = round(t0)
     t0 = t0 * 300
-    
+    HH0 = int(round(float(HH)/2)*2)
     Tm =str(int(t0))
     
     for i in range(N):
@@ -232,7 +232,8 @@ def main(argv):
         
         OUT = 'SAR_GPS_PWV_RAW_' + DATE0
         OUT2 = 'SAR_GPS_PWV_' + DATE0
-        STR_HH = " " + HH + " "
+        STR_HH = " " + str(HH0) + " "
+        print 'UTC: (Hour) ' + str(HH0) + ' (PWV constant will be used)'
         call_str = "grep " + STR_HH + ' ' + Research_File + ' > ' + OUT
         os.system(call_str)
         
