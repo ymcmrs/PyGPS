@@ -114,7 +114,8 @@ def yyyy2yyyymmddhhmmss(t0):
     mm = int((t0*24 - int(t0*24))*60)
     ss = (t0*24*60 - int(t0*24*60))*60
     ST = str(hh)+':'+str(mm)+':'+str(ss)
-    return ST  
+    h0 = str(hh)
+    return ST,h0
 
 def unitdate(DATE):
     LE = len(str(int(DATE)))
@@ -192,7 +193,7 @@ def main(argv):
     TXT =inps.gps_txt
     
     t0 = inps.imaging_time
-    SST = yyyy2yyyymmddhhmmss(float(t0))
+    SST,HH = yyyy2yyyymmddhhmmss(float(t0))
     t0 =float(t0)/3600/24
     t0 = float(t0)*24*12
     t0 = round(t0)
@@ -228,7 +229,14 @@ def main(argv):
         call_str = "grep " + str(JDSEC_SAR) + ' ' + Research_File + ' > ' + OUT
         os.system(call_str)
         
-        call_str = "awk '{print $10,$2,$3,$4,$5} ' "+ OUT + ' >' +OUT2
+        
+        OUT = 'SAR_GPS_PWV_RAW_' + DATE0
+        OUT2 = 'SAR_GPS_PWV_' + DATE0
+        STR_HH = " " + HH + " "
+        call_str = "grep " + STR_HH + ' ' + Research_File + ' > ' + OUT
+        os.system(call_str)
+        
+        call_str = "awk '{print $18,$7,$9} ' "+ OUT + ' >' +OUT2
         os.system(call_str)   
             
 
