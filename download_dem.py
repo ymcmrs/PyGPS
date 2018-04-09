@@ -29,6 +29,8 @@ from matplotlib.ticker import MultipleLocator, FormatStrFormatter
 #    NORTH=float(NORTH)
 #    return WEST,SOUTH,EAST,NORTH
 
+
+    
 def read_region(STR):
     WEST = STR.split('/')[0]
     EAST = STR.split('/')[1].split('/')[0]
@@ -41,8 +43,6 @@ def read_region(STR):
     EAST=float(EAST)
     NORTH=float(NORTH)
     return WEST,SOUTH,EAST,NORTH
-    
-        
 #######################################################################################
 
 INTRODUCTION = '''
@@ -53,12 +53,12 @@ INTRODUCTION = '''
 
 
 EXAMPLE = '''EXAMPLES:
-    download_dem.py -r west/south/east/north -o OUT_NAME 
-    download_dem.py -r west/south/east/north
+    download_dem.py -r west/east/south/north -o OUT_NAME 
+    download_dem.py -r west/east/south/north
 
     e.g.,
-    download_dem.py -r " -30/32/-108/-106 "   
-    download_dem.py -r " -30/32/-108/-106 " -o SouthCalifornia.tif
+    download_dem.py -r " -120/-115/32/36 "   
+    download_dem.py -r " -120/-115/32/36 " -o SouthCalifornia.tif
     
 '''
 
@@ -87,11 +87,11 @@ def main(argv):
     inps = cmdLineParse()
     Region_Str = inps.region
     west,south,east,north = read_region(Region_Str)
-    
+
     if inps.out: NM = inps.out
     else: NM = 'dem.tif'
     
-    call_str='wget -O dem.tif "http://ot-data1.sdsc.edu:9090/otr/getdem?north=%f&south=%f&east=%f&west=%f&demtype=SRTMGL1"' % (north,south,east,west)
+    call_str='wget -q -O dem.tif "http://ot-data1.sdsc.edu:9090/otr/getdem?north=%f&south=%f&east=%f&west=%f&demtype=SRTMGL1"' % (north,south,east,west)
     os.system(call_str)
     
     call_str = 'mv dem.tif ' + NM
