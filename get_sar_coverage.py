@@ -176,7 +176,7 @@ def main(argv):
     TXT ='sar_coverage.gmt'
     if os.path.isfile(TXT):
         os.remove(TXT)
-
+    i=1
     LAT1=f_h5[k1][k2[i]].attrs['LAT_REF1']
     LAT2=f_h5[k1][k2[i]].attrs['LAT_REF2']
     LAT3=f_h5[k1][k2[i]].attrs['LAT_REF3']
