@@ -247,7 +247,9 @@ def main(argv):
                 call_str = 'zgrep -A0 ' + "'" + GPS_Station + ' ' + yy[2:4] + ':'+day+':'+SEC+"' " + FF + ' >>' + STRFILE
                 print call_str
                 os.system(call_str)
-                os.remove(FF)
+                
+                if os.path.isfile(FF):
+                    os.remove(FF)
                 
             
              
@@ -268,7 +270,9 @@ def main(argv):
                 call_str = 'zgrep -A0 ' + "'" + GPS_Station + ' ' + yy[2:4] + ':'+day+':'+SEC+"' " + FF + ' >>' + STRFILE
                 print call_str
                 os.system(call_str)
-                os.remove(FF)
+                
+                if os.path.isfile(FF):
+                    os.remove(FF)
     
 
 if __name__ == '__main__':
