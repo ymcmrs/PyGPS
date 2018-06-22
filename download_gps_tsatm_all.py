@@ -187,6 +187,7 @@ def cmdLineParse():
     parser.add_argument('-s', dest='start', help='start date.')
     parser.add_argument('-e', dest='end', help='end date.')
     parser.add_argument('-t', dest='run_time', help='downloading time in pegasus.')
+    parser.add_argument('-u', dest='utc_time', help='UTC time for troposphere.')
     parser.add_argument('-m', dest='memory', help='downloading memory in pegasus.')
     
     inps = parser.parse_args()
@@ -206,6 +207,11 @@ def main(argv):
     GPS_File = inps.search_gps
     Start_Date = inps.start
     End_Date = inps.end
+    if inps.utc_time:
+        UTC = inps.utc_time
+    else:
+        UTC = '14:00'
+    
     
     call_str = "awk '{print $1}' search_gps.txt  > search_stations"
     os.system(call_str)
@@ -221,7 +227,7 @@ def main(argv):
         
     for i in range(N):
         ST0 = Stations[i]  
-        call_str = 'echo download_gps_tsatm.py -p ' + ST0 + ' -s ' + Start_Date + ' -e ' + End_Date + ' >>' + run_file
+        call_str = 'echo download_gps_tsatm.py -p ' + ST0 + ' -s ' + Start_Date + ' -e ' + End_Date + ' -t '+ UTC +  ' >>' + run_file
         os.system(call_str)
     
     
