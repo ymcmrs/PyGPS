@@ -242,7 +242,8 @@ def main(argv):
     else:
         tim = '0:30'
         
-    call_str='$INT_SCR/createBatch.pl ' + 'run_download_tsatm memory=' + mem + ' walltime=' + tim
+    DIR0 = os.getcwd()  
+    call_str='$INT_SCR/createBatch.pl ' + DIR0+'/run_download_tsatm memory=' + mem + ' walltime=' + tim
     os.system(call_str)
 
 if __name__ == '__main__':
