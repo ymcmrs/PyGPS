@@ -230,51 +230,28 @@ def main(argv):
     
     for i in range(Start_Year,End_Year+1):        
         print 'Start to download atmosphere date for year: ' + str(i)
-        if not i==End_Year:
-            Nm =str(i)
-   
-            for j in range(366):
-                N = 366
-                print_progress(j+1, N, prefix='Year: ', suffix=Nm)
-                yy=str(i)
-                dd=str(int(j+1))
-                day = unitday(dd)
-                STR_WEB = 'ftp://gneiss.nbmg.unr.edu/trop/' + yy + '/' + day + '/' + GPS_Station+ day+'0.' + yy[2:4]+'zpd.gz'
-                call_str = 'wget -q ' + STR_WEB
-                os.system(call_str)
-                
-                FF=GPS_Station+ day+'0.' + yy[2:4]+'zpd.gz'    
-                call_str = 'zgrep -A0 ' + "'" + GPS_Station + ' ' + yy[2:4] + ':'+day+':'+SEC+"' " + FF + ' >>' + STRFILE
-                print call_str
-                os.system(call_str)
-                
-                if os.path.isfile(FF):
-                    os.remove(FF)
-                
-            
-             
+        if i==End_Year:
+            k0 = End_Day
         else:
-            Nm =str(i)
-            for j in range(End_Day):
-                N = End_Day
-                print_progress(j+1, N, prefix='Year: ', suffix=Nm)
-                yy=str(End_Year)
-                dd=str(int(j+1))
-                day = unitday(dd)
-                STR_WEB = 'ftp://gneiss.nbmg.unr.edu/trop/' + yy + '/' + day + '/' + GPS_Station+ day+'0.' + yy[2:4]+'zpd.gz'
-                call_str = 'wget -q ' + STR_WEB
-                print STR_WEB
-                os.system(call_str)  
-                
-                FF=GPS_Station+ day+'0.' + yy[2:4]+'zpd.gz'  
+            k0 = 366
+        Nm = str(i)
+        for j in range(k0):
+            N = k0
+            print_progress(j+1, N, prefix='Year: ', suffix=Nm)
+            yy=str(i)
+            dd=str(int(j+1))
+            day = unitday(dd)
+            STR_WEB = 'ftp://gneiss.nbmg.unr.edu/trop/' + yy + '/' + day + '/' + GPS_Station+ day+'0.' + yy[2:4]+'zpd.gz'
+            call_str = 'wget -q ' + STR_WEB
+            os.system(call_str)
+            
+            FF=GPS_Station+ day+'0.' + yy[2:4]+'zpd.gz'
+            if os.path.isfile(FF):
                 call_str = 'zgrep -A0 ' + "'" + GPS_Station + ' ' + yy[2:4] + ':'+day+':'+SEC+"' " + FF + ' >>' + STRFILE
-                print call_str
                 os.system(call_str)
-                
-                if os.path.isfile(FF):
-                    os.remove(FF)
-    
-
+                os.remove(FF)
+              
+            
 if __name__ == '__main__':
     main(sys.argv[1:])
 
