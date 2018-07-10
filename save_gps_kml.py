@@ -22,8 +22,8 @@ def read_region(STR):
     WEST = STR.split('/')[0]
     EAST = STR.split('/')[1].split('/')[0]
     
-    SOUTH = STR.split(EAST+'/')[1].split('/')[0]
-    NORTH = STR.split(EAST+'/')[1].split('/')[1]
+    SOUTH = STR.split(WEST+'/'+EAST+'/')[1].split('/')[0]
+    NORTH = STR.split(WEST+'/'+EAST+'/')[1].split('/')[1]
     
     WEST =float(WEST)
     SOUTH=float(SOUTH)
