@@ -1,6 +1,6 @@
 # PyGPS
 ## Extracing displacement and atmospheric parameters from GPS products for improving InSAR geodesy.
-###      
+### GPS products from NGL (Nevada Geodetic Laboratory) or UNAVCO is supported.    
 
 ### 1 Download
 
