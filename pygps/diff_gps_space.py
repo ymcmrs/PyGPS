@@ -160,9 +160,9 @@ def main(argv):
                 AA.append(str(int(DD[i])))
         DD = AA
     
-    print ''
-    print "Differential date: "
-    print DD
+    print('')
+    print("Differential date: ")
+    print(DD)
     
     RefDate = inps.RefDate
     REF_DEF = 'gps_def_los_' + unitdate(str(int(unitdate(RefDate))))

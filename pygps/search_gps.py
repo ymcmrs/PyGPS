@@ -37,7 +37,7 @@ def UseGamma(inFile, task, keyword):
                 strtemp = line.split(":")
                 value = strtemp[1].strip()
                 return value
-        print "Keyword " + keyword + " doesn't exist in " + inFile
+        print("Keyword " + keyword + " doesn't exist in " + inFile)
         f.close()    
 
 def is_number(s):
@@ -113,11 +113,11 @@ def main(argv):
                 if  ( 0 < Year < 20 and 0 < Month < 13 and 0 < Day < 32 ):            
                     Datelist.append(ListSLC[kk])
     
-        map(int,Datelist)                
+        list(map(int,Datelist))                
         Datelist.sort()
-        map(str,Datelist)
+        list(map(str,Datelist))
         SLCpar = slcDir + "/" + Datelist[0] +"/" + Datelist[0] + ".slc.par"
-        print "SLCpar file: %s" % SLCpar
+        print("SLCpar file: %s" % SLCpar)
     else:
         SLCpar = inps.SLCpar
         #gpsDir = os.getcwd() + '/PYGPS'
@@ -182,7 +182,7 @@ def main(argv):
     BName = os.path.basename(FILE)
     Sufix = BName.split('.')[len(BName.split('.'))-1]
     if Sufix == 'par':
-        print ' '
+        print(' ')
         call_str = "SLC_corners "+ FILE + " > corners.txt"
         os.system(call_str)
         
@@ -210,17 +210,17 @@ def main(argv):
         east = MaxLon
         west = MinLon
 
-        print 'The coverage area of SAR image is :   '    
-        print '*** maxlat: '+str(north)
-        print '*** minlat: '+str(south)
-        print '*** maxlon: '+str(east)
-        print '*** minlon: '+str(west)
+        print('The coverage area of SAR image is :   ')    
+        print('*** maxlat: '+str(north))
+        print('*** minlat: '+str(south))
+        print('*** maxlon: '+str(east))
+        print('*** minlon: '+str(west))
     
     rm('corners.txt')
     ######################## Search GPS stations #########################################
     
-    print ''
-    print 'Start to search available GPS stations in SAR coverage >>> '
+    print('')
+    print('Start to search available GPS stations in SAR coverage >>> ')
     
     IDX = np.where( (MinLat< P_Lat) & (P_Lat < MaxLat) & ( MinLon< P_Lon) & (P_Lon < MaxLon))
     kk = []
@@ -230,7 +230,7 @@ def main(argv):
         
     kk = np.array(kk)
     kk = kk.flatten()
-    print '...'
+    print('...')
     
     date1 = 0
     date2 = 99999999
@@ -238,11 +238,11 @@ def main(argv):
     if inps.Dbeg:
         Dbeg = inps.Dbeg
         date1 = float_yyyymmdd(Dbeg)
-        print date1
+        print(date1)
     if inps.Dend:
         Dend = inps.Dend
         date2 = float_yyyymmdd(Dend)
-        print date2
+        print(date2)
         
     x = len(kk)
     kk_mod = []
@@ -256,11 +256,11 @@ def main(argv):
     kk = kk_mod
     x = len(kk)
     if x ==0:
-        print 'No GPS station is found in the SAR coverage!'
+        print('No GPS station is found in the SAR coverage!')
     else:
-        print 'Number of available GPS station:  %s' % str(x)
-        print ''
-        print '  Station Name      Lat(deg)      Long(deg)       Date_beg      Date_end  '
+        print('Number of available GPS station:  %s' % str(x))
+        print('')
+        print('  Station Name      Lat(deg)      Long(deg)       Date_beg      Date_end  ')
     
     
     TXT = "search_gps.txt"
@@ -275,7 +275,7 @@ def main(argv):
         DE = P_Dend[kk[i]]
         call_str = 'echo ' + str(Nm) + ' ' + str(LAT) + ' ' + str(LON)   + ' ' + str(DB) + ' ' + str(DE) + ' ' + str(TS) + ' ' + str(INC) + ' ' + str(HEAD) + ' >> ' + TXT
         os.system(call_str)
-        print '     ' + str(Nm) + '           ' + str(LAT) + '       ' + str(LON) + '       ' + str(DB) + '     ' + str(DE) 
+        print('     ' + str(Nm) + '           ' + str(LAT) + '       ' + str(LON) + '       ' + str(DB) + '     ' + str(DE)) 
         
                
 

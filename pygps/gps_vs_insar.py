@@ -307,12 +307,12 @@ def main(argv):
             REF_NM = inps.ref_gps
             if REF_NM in NM_ATM:
                 IDX = NM_ATM.index(REF_NM)
-                print 'Referenced GPS station is: %s' % REF_NM
+                print('Referenced GPS station is: %s' % REF_NM)
             else:
-                print 'Provided GPS station has been masked (i.e., has no InSAR results)!!'
+                print('Provided GPS station has been masked (i.e., has no InSAR results)!!')
                 IDX = 0
                 REF_NM = NM_ATM[0]
-                print 'GPS station %s is chosen as the referenced point!!' % NM_ATM[0]
+                print('GPS station %s is chosen as the referenced point!!' % NM_ATM[0])
         else:
             IDX = 0
             REF_NM = NM_ATM[0]
@@ -324,7 +324,7 @@ def main(argv):
         InSAR = InSAR - InSAR[REF_AZIMUTH][REF_RANGE]
         #InSAR = -InSAR
         
-        ZTD_ATM = map(float,ZTD_ATM)
+        ZTD_ATM = list(map(float,ZTD_ATM))
         ZTD_ATM = np.asarray(ZTD_ATM)
         GPS0 = ZTD_ATM - ZTD_ATM[IDX]
         N =len(NM_ATM)
@@ -415,12 +415,12 @@ def main(argv):
             REF_NM = inps.ref_gps
             if REF_NM in NM_DEF:
                 IDX = NM_DEF.index(REF_NM)
-                print 'Referenced GPS station is: %s' % REF_NM
+                print('Referenced GPS station is: %s' % REF_NM)
             else:
-                print 'Provided GPS station has been masked (i.e., has no InSAR results)!!'
+                print('Provided GPS station has been masked (i.e., has no InSAR results)!!')
                 IDX = 0
                 REF_NM = NM_DEF[0]
-                print 'GPS station %s is chosen as the referenced point!!' % NM_DEF[0]
+                print('GPS station %s is chosen as the referenced point!!' % NM_DEF[0])
         else:
             IDX = 0
             REF_NM = NM_DEF[0]
@@ -431,7 +431,7 @@ def main(argv):
         InSAR = InSAR_Data
         InSAR = InSAR - InSAR[REF_AZIMUTH][REF_RANGE]
         
-        ZTD_DEF = map(float,ZTD_DEF)
+        ZTD_DEF = list(map(float,ZTD_DEF))
         ZTD_DEF = np.asarray(ZTD_DEF)
         GPS0 = ZTD_DEF - ZTD_DEF[IDX]
         N =len(NM_DEF)

@@ -209,8 +209,8 @@ def main(argv):
         HEAD =inps.head
         k_flag = 1
     
-    print 'Start to estimate GPS LOS deformation data >>>'
-    print ''
+    print('Start to estimate GPS LOS deformation data >>>')
+    print('')
     for i in range(N):
         Nm =str(GPS_Nm[i])
         print_progress(i+1, N, prefix='Station name: ', suffix=Nm)

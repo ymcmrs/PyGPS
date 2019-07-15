@@ -200,7 +200,7 @@ def main(argv):
         N_Av = float(inps.average_number)
         
         
-    print 'Start to get SAR asquisition related LOS deformations: '    
+    print('Start to get SAR asquisition related LOS deformations: ')    
     for i in range(N_DATE):
         DATE0 = DATE[i]
         DATE0 = unitdate(DATE0)
@@ -255,7 +255,7 @@ def main(argv):
                 
                 call_str = 'echo ' + NM0 + ' ' + LOS + ' ' + MAE + ' ' + SIG + ' >>' + OUT
                 os.system(call_str)
-        print DATE0  + '( MJD '+ str(int(MJD))+ ')' +': ' + str(int(sum0)) + ' stations available'
+        print(DATE0  + '( MJD '+ str(int(MJD))+ ')' +': ' + str(int(sum0)) + ' stations available')
         
         
 

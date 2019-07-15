@@ -14,7 +14,12 @@ import h5py
 import argparse
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MultipleLocator, FormatStrFormatter
-import pysar._readfile as readfile
+
+from mintpy.utils import (ptime,
+                          readfile,
+                          variance,
+                          utils as ut,
+                          plot as pp)
 
 ############### function to get image corners ################
 def read_region(STR):
@@ -125,7 +130,7 @@ def UseGamma(inFile, task, keyword):
                 strtemp = line.split(":")
                 value = strtemp[1].strip()
                 return value
-        print "Keyword " + keyword + " doesn't exist in " + inFile
+        print("Keyword " + keyword + " doesn't exist in " + inFile)
         f.close()    
 
 def is_number(s):
@@ -275,8 +280,8 @@ def main(argv):
         IDX = np.where(P_Lon > 0)
         P_Lon[IDX] = P_Lon[IDX] + 360
     
-    print ''
-    print 'Start to search available GPS stations in SAR coverage >>> '
+    print('')
+    print('Start to search available GPS stations in SAR coverage >>> ')
 
     
     IDX = np.where( (MinLat< P_Lat) & (P_Lat < MaxLat) & ( MinLon< P_Lon) & (P_Lon < MaxLon))
@@ -289,7 +294,7 @@ def main(argv):
     #print kk    
     kk = np.array(kk)
     kk = kk.flatten()
-    print '...'
+    print('...')
     
     date1 = 0
     date2 = 99999999
@@ -297,11 +302,11 @@ def main(argv):
     if inps.start:
         Dbeg = inps.start
         date1 = float_yyyymmdd(Dbeg)
-        print date1
+        print(date1)
     if inps.end:
         Dend = inps.end
         date2 = float_yyyymmdd(Dend)
-        print date2
+        print(date2)
         
     x = len(kk)
     kk_mod = []
@@ -336,11 +341,11 @@ def main(argv):
     kk = kk_mod
     x = len(kk)
     if x ==0:
-        print 'No GPS station is found in the SAR coverage!'
+        print('No GPS station is found in the SAR coverage!')
     else:
-        print 'Number of available GPS station:  %s' % str(x)
-        print ''
-        print '  Station Name      Lat(deg)      Long(deg)       Height(m)      Date_beg      Date_end  '
+        print('Number of available GPS station:  %s' % str(x))
+        print('')
+        print('  Station Name      Lat(deg)      Long(deg)       Height(m)      Date_beg      Date_end  ')
     
  
     if os.path.isfile(OUT):
@@ -373,7 +378,7 @@ def main(argv):
         
         call_str = 'echo '  + str(LON) +' ' + str(LAT) + ' ' + str(Nm)  + ' >> ' + PSTEXT
         os.system(call_str)
-        print '     ' + str(Nm) + '           ' + str(LAT) + '       ' + str(LON) +'       ' + str(HEI) + '       ' + str(DB) + '     ' + str(DE) + ' ' +str(int(flag0))
+        print('     ' + str(Nm) + '           ' + str(LAT) + '       ' + str(LON) +'       ' + str(HEI) + '       ' + str(DB) + '     ' + str(DE) + ' ' +str(int(flag0)))
         
                
 if __name__ == '__main__':

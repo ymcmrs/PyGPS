@@ -28,7 +28,7 @@ def Nm2h(gps_txt,Nm):
         h0=GPS_HEI[GPS_Nm.index(Nm[i])]
         h.append(float(h0))
     
-    h=map(float,h)
+    h=list(map(float,h))
     h=[k/1000.0 for k in h]        
     return h
 
@@ -60,9 +60,9 @@ def get_data(gps_txt,date):
         GPS_Atm_Ts = GPS_ATM[:,3]
         GPS_Atm_Ts = GPS_Atm_Ts.tolist()
     
-        y=map(float,GPS_Atm_Ts)
+        y=list(map(float,GPS_Atm_Ts))
         y=[k/10.0 for k in y]
-        y=map(float,y)  
+        y=list(map(float,y))  
     else: 
         GPS_Nm_Atm=''
         y=''
@@ -200,7 +200,7 @@ def main(argv):
     f_res = open('RES_Trop','a')
     f = open(OUT,'a')
     for i in range(Start_Year,End_Year+1):        
-        print 'Start to estimate spatial model parameters of atmospheric delay: ' + str(i)
+        print('Start to estimate spatial model parameters of atmospheric delay: ' + str(i))
         
                 
         #if Start_Year==End_Year:

@@ -229,7 +229,7 @@ def main(argv):
         os.remove(STRFILE)
     
     for i in range(Start_Year,End_Year+1):        
-        print 'Start to download atmosphere date for year: ' + str(i)
+        print('Start to download atmosphere date for year: ' + str(i))
         if i==End_Year:
             k0 = End_Day
         else:

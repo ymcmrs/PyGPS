@@ -75,7 +75,7 @@ def UseGamma(inFile, task, keyword):
                 strtemp = line.split(":")
                 value = strtemp[1].strip()
                 return value
-        print "Keyword " + keyword + " doesn't exist in " + inFile
+        print("Keyword " + keyword + " doesn't exist in " + inFile)
         f.close()
 
         
@@ -175,7 +175,7 @@ def main(argv):
         call_str = 'echo ' + STR + ' >> ' + OUT
         os.system(call_str)
         
-        print str(NM) + ': ' + str(LAT) + ' (la) ' + str(LON) + ' (lo) ' + str(Azimuth) + ' (az) ' + str(Range) + ' (ra) '
+        print(str(NM) + ': ' + str(LAT) + ' (la) ' + str(LON) + ' (lo) ' + str(Azimuth) + ' (az) ' + str(Range) + ' (ra) ')
 ##############################################################################
 if __name__ == '__main__':
     main(sys.argv[1:])

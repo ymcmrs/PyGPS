@@ -188,7 +188,7 @@ def main(argv):
     TXT =inps.station_txt
     for i in range(N):
         DATE0 = DATE[i]
-        print 'Get research tropospheric data >>> ' + DATE0
+        print('Get research tropospheric data >>> ' + DATE0)
         call_str = 'get_research_atm_date.py ' + DATE0 + ' --station_txt ' + TXT
         os.system(call_str)
             

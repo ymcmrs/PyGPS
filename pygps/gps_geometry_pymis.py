@@ -75,13 +75,13 @@ def UseGamma(inFile, task, keyword):
                 strtemp = line.split(":")
                 value = strtemp[1].strip()
                 return value
-        print "Keyword " + keyword + " doesn't exist in " + inFile
+        print("Keyword " + keyword + " doesn't exist in " + inFile)
         f.close()
 
 def read_h5(FILE):
     f = h5py.File(FILE,'r')
-    kl1 = f.keys()[0]
-    kl2 = f[kl1].keys()[0]
+    kl1 = list(f.keys())[0]
+    kl2 = list(f[kl1].keys())[0]
     data = f[kl1].get(kl2)[()]
     
     return data
@@ -132,8 +132,8 @@ def main(argv):
     
     
     f_lt = h5py.File(LT,'r')
-    kl1 = f_lt.keys()[0]
-    kl2 = f_lt[kl1].keys()[0]
+    kl1 = list(f_lt.keys())[0]
+    kl2 = list(f_lt[kl1].keys())[0]
     
     data = f_lt[kl1].get(kl2)[()]
     atr_lt = f_lt[kl1].attrs 
@@ -218,7 +218,7 @@ def main(argv):
         call_str = 'echo ' + STR + ' >> ' + OUT
         os.system(call_str)
         
-        print STR
+        print(STR)
 ##############################################################################
 if __name__ == '__main__':
     main(sys.argv[1:])

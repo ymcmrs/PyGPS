@@ -213,7 +213,7 @@ def main(argv):
     kk = AA.size
     
     if kk>1:
-        AA = map(int,AA)
+        AA = list(map(int,AA))
         IDX = AA.index(max(AA))
         FILE = BB[int(IDX),8]
     else:
@@ -228,10 +228,10 @@ def main(argv):
         os.remove(FILE)
     
     call_str = 'wget -q ftp://data-out.unavco.org/pub/products/troposphere/' + YEAR + '/' + DAY + '/' + FILE
-    print 'Downloading GPS troposphere data ...'
+    print('Downloading GPS troposphere data ...')
     os.system(call_str)
-    print 'Download finish.'
-    print ''
+    print('Download finish.')
+    print('')
     
     FILE0 = FILE.replace('.gz','')
     if os.path.isfile(FILE0):
@@ -256,10 +256,10 @@ def main(argv):
         k=len(DD)
         DD = DD.tolist()
     if k>0:
-        print 'Extracting tropospheric delays for ' + str(int(k)) + ' GPS stations:'
+        print('Extracting tropospheric delays for ' + str(int(k)) + ' GPS stations:')
         for i in range(k):
             Nm=DD[i]
-            print Nm
+            print(Nm)
             OUT = Nm+ '_Trop_' + DATE
             call_str = "grep " + Nm + ' ' + Trop_GPS + '> ' + OUT
             os.system(call_str)

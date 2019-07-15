@@ -125,7 +125,7 @@ def UseGamma(inFile, task, keyword):
                 strtemp = line.split(":")
                 value = strtemp[1].strip()
                 return value
-        print "Keyword " + keyword + " doesn't exist in " + inFile
+        print("Keyword " + keyword + " doesn't exist in " + inFile)
         f.close()    
 
 def is_number(s):
@@ -169,8 +169,8 @@ def main(argv):
     inps = cmdLineParse() 
     H5 = inps.h5_file
     f_h5 = h5py.File(H5,'r')
-    k1 = f_h5.keys()[0]
-    k2 = f_h5[k1].keys()
+    k1 = list(f_h5.keys())[0]
+    k2 = list(f_h5[k1].keys())
     N = len(k2)
     
     TXT ='sar_coverage.gmt'

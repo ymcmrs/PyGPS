@@ -210,7 +210,7 @@ def main(argv):
         k=len(DD)
         DD = DD.tolist()
         
-    print 'Extracting tropospheric delays for ' + str(int(k)) + ' GPS stations:'
+    print('Extracting tropospheric delays for ' + str(int(k)) + ' GPS stations:')
     if os.path.isfile(OUT):
         os.remove(OUT)
     for i in range(k):
@@ -222,7 +222,7 @@ def main(argv):
         
     PWV_GPS = 'Global_GPS_PWV_' + DATE   
     OUT = 'Research_GPS_PWV_' + DATE     
-    print 'Extracting PWV for ' + str(int(k)) + ' GPS stations:'
+    print('Extracting PWV for ' + str(int(k)) + ' GPS stations:')
     if os.path.isfile(OUT):
         os.remove(OUT)
     for i in range(k):

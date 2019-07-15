@@ -211,11 +211,11 @@ def main(argv):
         
         Research_File = 'Research_GPS_Trop_'+DATE0
         Research_File_PWV = 'Research_GPS_PWV_'+DATE0
-        print ''
-        print "SAR acquisition time (UTC) is: " +DATE0[0:4] + ' ' + DATE0[4:6] + ' ' +DATE0[6:8] + ' ' + SST
+        print('')
+        print("SAR acquisition time (UTC) is: " +DATE0[0:4] + ' ' + DATE0[4:6] + ' ' +DATE0[6:8] + ' ' + SST)
         JDSEC_SAR = int(JDSEC + t0)
-        print "SAR acquisition time (J2000) is: " + str(JDSEC_SAR) + ' (SEC)'
-        print ''
+        print("SAR acquisition time (J2000) is: " + str(JDSEC_SAR) + ' (SEC)')
+        print('')
         
         OUT = 'SAR_GPS_Trop_RAW_' + DATE0
         OUT2 = 'SAR_GPS_Trop_' + DATE0
@@ -233,7 +233,7 @@ def main(argv):
         os.system(call_str)  
         
         
-        print 'UTC: (Hour) ' + str(HH0) + ' (PWV constant will be used)'
+        print('UTC: (Hour) ' + str(HH0) + ' (PWV constant will be used)')
         
         OUT = 'SAR_GPS_PWV_RAW_' + DATE0
         OUT2 = 'SAR_GPS_PWV_' + DATE0

@@ -214,8 +214,8 @@ def main(argv):
     GPS_Nm = GPS_Nm.tolist()
     N = len(GPS_Nm)
     
-    print 'Start to download GPS deformation data >>>'
-    print ''
+    print('Start to download GPS deformation data >>>')
+    print('')
     for i in range(N):
         Nm =str(GPS_Nm[i])
         print_progress(i+1, N, prefix='Station name: ', suffix=Nm)
