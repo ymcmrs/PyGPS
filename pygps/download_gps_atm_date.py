@@ -169,8 +169,8 @@ def cmdLineParse():
                                      epilog=INTRODUCTION+'\n'+EXAMPLE)
 
     parser.add_argument('date',help='GPS station name.')
-    parser.add_argument('--station', dest='station_name', help='GPS station name.')
-    parser.add_argument('--station_txt', dest='station_txt', help='GPS station txet file.')
+    #parser.add_argument('--station', dest='station_name', help='GPS station name.')
+    #parser.add_argument('--station_txt', dest='station_txt', help='GPS station txet file.')
     
     inps = parser.parse_args()
 
@@ -188,24 +188,33 @@ def main(argv):
     YEAR = ST[0:4]
     DAY = ST[4:]
     
+    PATH = os.getcwd()
+    gps_dir = PATH + '/GPS'
+    gps_atm_dir = PATH + '/GPS/atm'
+    gps_def_dir = PATH + '/GPS/def'
     
-    Trop_GPS = 'Global_GPS_Trop_' + DATE 
+    if not os.path.isdir(gps_dir):
+        call_str = 'mkdir ' + gps_dir
+        os.system(call_str)
     
+    if not os.path.isdir(gps_atm_dir):
+        call_str = 'mkdir ' + gps_atm_dir
+        os.system(call_str)
+
     call_str = 'curl ftp://data-out.unavco.org/pub/products/troposphere/' + YEAR + '/' + DAY + '/' + ' >ttt' 
+    os.system(call_str)    
+    
+    # get aps file for downloading 
+    call_str ="grep 'cwu' ttt > ttt_aps"
+    os.system(call_str)
+    call_str ="grep '.gz' ttt_aps > ttt0"
+    os.system(call_str)
+    BB = np.loadtxt('ttt0',dtype=np.str)
+    
+    call_str = "awk '{print $5}' ttt0 >ttt_size"
     os.system(call_str)
     
-    call_str ="grep 'cwu' ttt > ttt1"
-    os.system(call_str)
-    
-    call_str ="grep '.gz' ttt1 > ttt"
-    os.system(call_str)
-    BB = np.loadtxt('ttt',dtype=np.str)
-    
-    
-    call_str = "awk '{print $5}' ttt >ttt1"
-    os.system(call_str)
-    
-    AA = np.loadtxt('ttt1')
+    AA = np.loadtxt('ttt_size')
     kk = AA.size
     
     if kk>1:
@@ -217,49 +226,43 @@ def main(argv):
         FILE = BB[8]
     
     
-    call_str = 'curl ftp://data-out.unavco.org/pub/products/troposphere/' + YEAR + '/' + DAY + '/' + ' >ttt' 
-    os.system(call_str)
-    call_str ="grep 'nmt' ttt > ttt1"
-    os.system(call_str)
-    
-    call_str ="grep '.gz' ttt1 > ttt"
-    os.system(call_str)
-    BB = np.loadtxt('ttt',dtype=np.str)
-    
-    
-    call_str = "awk '{print $5}' ttt >ttt1"
+    # get pwv file for downloading 
+    call_str ="grep 'nmt' ttt > ttt_pwv"
     os.system(call_str)
     
-    AA = np.loadtxt('ttt1')
-    kk = AA.size
+    fl =1
+    if os.path.getsize('ttt_pwv') > 0:
+        call_str ="grep '.gz' ttt_pwv > ttt0"
+        os.system(call_str)
+        BB = np.loadtxt('ttt0',dtype=np.str)
     
-    if kk>1:
-        AA = list(map(int,AA))
-        IDX = AA.index(max(AA))
-        FILE_PWV = BB[int(IDX),8]
+        call_str = "awk '{print $5}' ttt0 >ttt_size"
+        os.system(call_str)
+    
+        AA = np.loadtxt('ttt_size')
+        kk = AA.size
+        
+        if kk>1:
+            AA = list(map(int,AA))
+            IDX = AA.index(max(AA))
+            FILE_PWV = BB[int(IDX),8]
+        elif kk==1:
+            AA = int(AA)
+            FILE_PWV = BB[8]
     else:
-        AA = int(AA)
-        FILE_PWV = BB[8]
+        FILE_PWV = ''
+        fl=0
+        print('No PWV-file is found.')
     
-    #print YEAR
-    #print DAY
+    Trop_GPS = gps_atm_dir + '/' + 'Global_GPS_Trop_' + DATE 
     
-    if os.path.isfile(FILE):
-        os.remove(FILE)
-    
-    call_str = 'wget -q ftp://data-out.unavco.org/pub/products/troposphere/' + YEAR + '/' + DAY + '/' + FILE
-    print('Downloading GPS troposphere data ...')
-    os.system(call_str)
+    if not os.path.isfile(FILE):    
+        call_str = 'wget -q ftp://data-out.unavco.org/pub/products/troposphere/' + YEAR + '/' + DAY + '/' + FILE
+        print('Downloading GPS tropospheric delay data: %s' % DATE)
+        os.system(call_str)
     print('Download finish.')
     print('')
-    
-    
-    call_str = 'wget -q ftp://data-out.unavco.org/pub/products/troposphere/' + YEAR + '/' + DAY + '/' + FILE_PWV
-    print('Downloading GPS PWV data ...')
-    os.system(call_str)
-    print('Download finish.')
-    print('')
-    
+        
     FILE0 = FILE.replace('.gz','')
     if os.path.isfile(FILE0):
         os.remove(FILE0)
@@ -269,48 +272,47 @@ def main(argv):
     
     call_str ='cp ' + FILE0 + ' ' + Trop_GPS
     os.system(call_str)
-
     os.remove(FILE0)    
     
-    
-    
-    Trop_PWV_GPS = 'Global_GPS_PWV_' + DATE
-    
-    FILE0 = FILE_PWV.replace('.gz','')
-    if os.path.isfile(FILE0):
-        os.remove(FILE0)
 
-    call_str = 'gzip -d ' + FILE_PWV
-    os.system(call_str)
+    if (not os.path.isfile(FILE_PWV)) and (fl==1):
+        call_str = 'wget -q ftp://data-out.unavco.org/pub/products/troposphere/' + YEAR + '/' + DAY + '/' + FILE_PWV
+        print('Downloading GPS PWV data: %s' % DATE)
+        os.system(call_str)
+        print('Download finish.')
     
-    call_str ='cp ' + FILE0 + ' ' + Trop_PWV_GPS
-    os.system(call_str)
+    if fl ==1:
+        Trop_PWV_GPS = gps_atm_dir + '/' + 'Global_GPS_PWV_' + DATE
+        
+        FILE0 = FILE_PWV.replace('.gz','')
+        if os.path.isfile(FILE0):
+            os.remove(FILE0)
+        call_str = 'gzip -d ' + FILE_PWV
+        os.system(call_str)
+    
+        call_str ='cp ' + FILE0 + ' ' + Trop_PWV_GPS
+        os.system(call_str)
 
-    os.remove(FILE0)    
-    
-    
-    k=0
-    
-    if inps.station_name:
-        DD=readdate(inps.station_name)
-        k = len(DD)
-    elif inps.station_txt:
-        GPS= np.loadtxt(inps.station_txt, dtype = np.str)
-        DD =GPS[:,0]
-        k=len(DD)
-        DD = DD.tolist()
-    if k>0:
-        print('Extracting tropospheric delays for ' + str(int(k)) + ' GPS stations:')
-        for i in range(k):
-            Nm=DD[i]
-            print(Nm)
-            OUT = Nm+ '_Trop_' + DATE
-            call_str = "grep " + Nm + ' ' + Trop_GPS + '> ' + OUT
-            os.system(call_str)
-            
-            OUT = Nm+ '_Trop_PWV_' + DATE
-            call_str = "grep " + Nm + ' ' + Trop_PWV_GPS + '> ' + OUT
-            os.system(call_str)
+    #if inps.station_name:
+    #    DD=readdate(inps.station_name)
+    #    k = len(DD)
+    #elif inps.station_txt:
+    #    GPS= np.loadtxt(inps.station_txt, dtype = np.str)
+    #    DD =GPS[:,0]
+    #    k=len(DD)
+    #    DD = DD.tolist()
+    #if k>0:
+    #    print('Extracting tropospheric delays for ' + str(int(k)) + ' GPS stations:')
+    #    for i in range(k):
+    #        Nm=DD[i]
+    #        print(Nm)
+    #        OUT = gps_atm_dir + '/' + Nm + '_Trop_' + DATE
+    #        call_str = "grep " + Nm + ' ' + Trop_GPS + '> ' + OUT
+    #        os.system(call_str)
+    #        
+    #        OUT = gps_atm_dir + '/' + Nm + '_Trop_PWV_' + DATE
+    #        call_str = "grep " + Nm + ' ' + Trop_PWV_GPS + '> ' + OUT
+    #        os.system(call_str)
             
             
 if __name__ == '__main__':
