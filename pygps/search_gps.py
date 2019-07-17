@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 ############################################################
-# Program is part of PyGPS v1.0                            #
-# Copyright(c) 2017, Yunmeng Cao                           #
+# Program is part of PyGPS v2.0                            #
+# Copyright(c) 2017-2019, Yunmeng Cao                      #
 # Author:  Yunmeng Cao                                     #
 ############################################################
 
@@ -176,12 +176,12 @@ INTRODUCTION = '''
 
 
 EXAMPLE = '''EXAMPLES:
-    search_gps.py -f velocity.h5
+    search_gps.py -f geometryRadar.h5
     search_gps.py -b 120/122/34/38 -s 20100102 -e 20150101 -o gps_LosAngeles.txt
     search_gps.py -p 20100101.slc.par 
-    search_gps.py -f unwrapIfgram.h5 -e 20100102 -o gps_LosAngeles.txt
-    search_gps.py -f demGeo.h5 -s 20100102 --inside -o gps_LosAngeles.txt
-    search_gps.py -f demGeo.h5 -s 20100102 --extend_search 0.1 -o gps_LosAngeles.txt
+    search_gps.py -f velocity.h5 -e 20100102 -o gps_LosAngeles.txt
+    search_gps.py -f ifgramStack.h5 -s 20100102 --inside -o gps_LosAngeles.txt
+    search_gps.py -f timeseries.h5 -s 20100102 --extend_search 0.1 -o gps_LosAngeles.txt
 '''
 
 
@@ -193,8 +193,8 @@ def cmdLineParse():
     parser.add_argument('-f',dest='file', help='h5 file used to check area region.')
     parser.add_argument('-p',dest='slc_par', help='slc_par file used to check area region, GAMMA/SLC_corners will be called.')
     parser.add_argument('-b','--box', dest='box',help='box corners of research region. e.g., 120/122/33/34 ')
-    parser.add_argument('-s', '--start-date',dest='start', help='start date.')
-    parser.add_argument('-e', '--end-date',dest='end', help='end date.')
+    parser.add_argument('-s', '--start-date',dest='start', help='start date, GPS data should be available before this date.')
+    parser.add_argument('-e', '--end-date',dest='end', help='end date, GPS data should be availabe after this date.')
     parser.add_argument('-o','--out', dest='out', help='output file name.')
     parser.add_argument('--inside', action="store_true", default=False, help='Constraining stations inside the SAR coverage, otherwise, in the corner rectangle region.')
     parser.add_argument('--extend_search', dest='extend_search', help='extend the search region based on the box corner.')
