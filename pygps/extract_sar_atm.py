@@ -70,6 +70,22 @@ def add_zero(s):
         s="0"+s
     return s   
     
+def is_number(s):
+    try:
+        float(s)
+        return True
+    except ValueError:
+        pass
+ 
+    try:
+        import unicodedata
+        unicodedata.numeric(s)
+        return True
+    except (TypeError, ValueError):
+        pass
+ 
+    return False    
+    
 def yyyymmdd2yyyydd(DATE):
     LE = len(str(int(DATE)))
     DATE = str(DATE)
@@ -168,7 +184,7 @@ def cmdLineParse():
     parser.add_argument('gps_txt',help='GPS station text file.')
     parser.add_argument('imaging_time',help='Center line UTC sec.')
     parser.add_argument('-d', '--date', dest='date_list', nargs='*',help='date list to extract.')
-    parser.add_argument('--date-txt', dest='date_txt', nargs='*',help='date list text to extract.')
+    parser.add_argument('--date-txt', dest='date_txt',help='date list text to extract.')
     
     inps = parser.parse_args()
 
@@ -183,10 +199,10 @@ def main(argv):
     if inps.date_list:
         date_list = inps.date_list
     if inps.date_txt:
-        date_list2 = np.loadtxt(LIST,dtype=np.str)
+        date_list2 = np.loadtxt(inps.date_txt,dtype=np.str)
         date_list2 = date_list2.tolist()
         for list0 in date_list2:
-            if list0 not in date_list:
+            if (list0 not in date_list) and is_number(list0):
                 date_list.append(list0)
     
     path0 = os.getcwd()
@@ -201,7 +217,9 @@ def main(argv):
     N = len(date_list)
     print('---------------------------------------')
     print('Total number of extracted date: %s ' % str(len(date_list)))
-    print('---------------------------------------')
+    for k0 in date_list:
+        print(k0)
+    #print('---------------------------------------')
     
     t0 = inps.imaging_time
     SST,HH = yyyy2yyyymmddhhmmss(float(t0))
@@ -213,10 +231,17 @@ def main(argv):
     hh0 = float(t0)/3600
     HH0 = int(round(float(hh0)/2)*2)
     Tm =str(int(t0))
-
+    
+    GPS = np.loadtxt(inps.gps_txt, dtype = np.str)
+    DD = GPS[:,0]
+    k=len(DD)
+    DD.tolist()
+    
+    print('---------------------')
+    print('Extract Tropospheric Delays: ')
     for i in range(N):
-        print('---------------------')
-        print('Extract job: ' + str(int(i+1)) + '/' + str(int(N)))
+        #print('---------------------')
+        #print('Job of Extract Tropospheric Delays: ' + str(int(i+1)) + '/' + str(int(N)))
         DATE0 = str(date_list[i])
         DATE0 = unitdate(DATE0)
         
@@ -225,45 +250,133 @@ def main(argv):
         JD = time.jd - 2451545.0
         JDSEC = JD*24*3600        
         JDSEC_SAR = int(JDSEC + t0)
-            
-        GPS = np.loadtxt(inps.gps_txt, dtype = np.str)
-        DD = GPS[:,0]
-        k=len(DD)
-        DD.tolist()    
-            
-        Trop_GPS = gps_dir + '/Global_GPS_Trop_' + str(DATE0)
-        if not os.path.isfile(Trop_GPS):
-            print('% is not found.' % Trop_GPS)
-        else:    
-            print('Extracting tropospheric delays for ' + str(int(k)) + ' GPS stations: %s' % DATE0)
-            OUT = gps_dir + '/SAR_GPS_Trop_' + str(DATE0)
-            if os.path.isfile(OUT):
-                os.remove(OUT)
-            
-            for i in range(k):
-                Nm=DD[i]
-                print_progress(i+1, k, prefix='Station name: ', suffix=Nm)
-                STR0 = '"' + str(JDSEC_SAR) + '.*' + str(Nm) + '"'
-                call_str = "grep -E " + STR0 + ' ' + Trop_GPS + '>> ' + OUT
-                os.system(call_str)
         
-        PWV_GPS = gps_dir + '/Global_GPS_PWV_' + str(DATE0)
-        if not os.path.isfile(PWV_GPS):
-            print('% is not found.' % PWV_GPS)
+        Trop_GPS = gps_dir + '/Global_GPS_Trop_' + str(DATE0)
+        Trop_SAR = gps_dir + '/SAR_GPS_Trop_' + str(DATE0)
+        tt_all = 'tt_' + str(DATE0)
+        tt_name = 'tt_name_' + str(DATE0)
+        
+        if os.path.isfile(Trop_SAR):
+            if os.path.getsize(Trop_SAR)==0:
+                os.remove(Trop_SAR)
+        
+        if not os.path.isfile(Trop_GPS):
+            #print('% is not found.' % Trop_GPS)
+            #SSS = DATE0 + '[No]'
+            SSS = DATE0 + ' [No ' + str(int(i+1)) + '/' + str(int(N)) + ']'
+            print_progress(i+1, N, prefix='Date: ', suffix=SSS)
+        elif os.path.isfile(Trop_SAR):
+            SSS = DATE0 + ' [Yes ' + str(int(i+1)) + '/' + str(int(N)) + ']'
+            print_progress(i+1, N, prefix='Date: ', suffix=SSS)
         else:
-            print('Extracting atmospheric PWV for ' + str(int(k)) + ' GPS stations: %s' % DATE0)
-            OUT = gps_dir + '/SAR_GPS_PWV_' + str(DATE0)
-            if os.path.isfile(OUT):
-                os.remove(OUT)
-            for i in range(k):
-                Nm=DD[i]
-                print_progress(i+1, k, prefix='Station name: ', suffix=Nm)
-                STR0 = ' " ' + str(HH0) + ' ' + '.*' + str(Nm) + '"'
-                call_str = "grep -E " + STR0 + ' ' + PWV_GPS + '>> ' + OUT
-                os.system(call_str)
-       
-        os.system(call_str)   
+            #SSS = DATE0 + '[Yes]'
+            SSS = DATE0 + ' [Yes ' + str(int(i+1)) + '/' + str(int(N)) + ']'
+            print_progress(i+1, N, prefix='Date: ', suffix=SSS)
+            Trop_SAR = gps_dir + '/SAR_GPS_Trop_' + str(DATE0)
+            # remove the first four lines
+            count = len(open(Trop_GPS,'r').readlines())
+            call_str = 'sed -n 5,' + str(count) + 'p ' +  Trop_GPS + ' >' + tt_all
+            os.system(call_str)
+            # extract all of the available station names
+            call_str = "awk '{print $10}' " + tt_all + ' >' + tt_name
+            os.system(call_str)
             
+            GPS_all = np.loadtxt(tt_name, dtype = np.str)
+            DD_all = GPS_all
+            k_all=len(DD_all)
+            #print(k_all)
+            DD_all.tolist()
+        
+            RR = np.zeros((k_all,),dtype = bool)
+            for i in range(k_all):
+                k0 = DD_all[i]
+                if k0 in DD:
+                    RR[i] = 1
+        
+            data = np.loadtxt(tt_all, dtype = np.str)
+            data_use = data[RR]
+            #print(data_use.shape)
+        
+            JDSEC_all = data_use[:,0]
+            #JDSEC_all = np.asarray(JDSEC_all,dtype = int)
+            nn = len(JDSEC_all)
+            RR2 = np.zeros((nn,),dtype = bool)
+            for i in range(nn):
+                #print(int(float(JDSEC_all[i])))
+                if int(float(JDSEC_all[i])) == JDSEC_SAR:
+                    RR2[i] =1
+
+            data_use_final = data_use[RR2]
+            #print(data_use_final.shape)     
+            np.savetxt(Trop_SAR,data_use_final,fmt='%s', delimiter=',')    
+            os.remove(tt_all)
+            os.remove(tt_name)
+        
+    print('---------------------')
+    print('Extract Atmospheric PWV: ')    
+    ## Extract PWV data ####     
+    for i in range(N):
+        #print('---------------------')
+        #print('Extract Atmospheric PWV: ' + str(int(i+1)) + '/' + str(int(N)))
+        DATE0 = str(date_list[i])
+        DATE0 = unitdate(DATE0)
+        PWV_GPS = gps_dir + '/Global_GPS_PWV_' + str(DATE0)
+        PWV_SAR = gps_dir + '/SAR_GPS_PWV_' + str(DATE0)
+        if os.path.isfile(PWV_SAR):
+            if os.path.getsize(PWV_SAR)==0:
+                os.remove(PWV_SAR)
+                
+        if not os.path.isfile(PWV_GPS):
+            #print('% is not found.' % PWV_GPS)
+            SSS = DATE0 + ' [No ' + str(int(i+1)) + '/' + str(int(N)) + ']'
+            print_progress(i+1, N, prefix='Date: ', suffix=SSS)
+        elif os.path.isfile(PWV_SAR):
+            SSS = DATE0 + ' [Yes ' + str(int(i+1)) + '/' + str(int(N)) + ']'
+            print_progress(i+1, N, prefix='Date: ', suffix=SSS)
+        else:
+            SSS = DATE0 + ' [Yes ' + str(int(i+1)) + '/' + str(int(N)) + ']'
+            print_progress(i+1, N, prefix='Date: ', suffix=SSS)
+
+            tt_all = 'tt_' + str(DATE0)
+            tt_name = 'tt_name_' + str(DATE0)
+            
+            count = len(open(PWV_GPS,'r').readlines())
+            call_str = 'sed -n 2,' + str(count) + 'p ' +  PWV_GPS + ' >' + tt_all
+            os.system(call_str)
+            # extract all of the available station names
+            call_str = "awk '{print $18}' " + tt_all + ' >' + tt_name
+            os.system(call_str)
+            
+            GPS_all = np.loadtxt(tt_name, dtype = np.str)
+            DD_all = GPS_all
+            k_all=len(DD_all)
+            #print(k_all)
+            DD_all.tolist()
+            
+            data = np.loadtxt(tt_all, dtype = np.str)
+            row,col = data.shape
+            RR = np.zeros((row,),dtype = bool)
+            for i in range(row):
+                k0 = DD_all[i]
+                if k0 in DD:
+                    RR[i] = 1
+            data_use = data[RR]
+            #print(data_use.shape)
+            HH_all = data_use[:,2]
+            nn = len(HH_all)
+            RR2 = np.zeros((nn,),dtype = bool)
+            for i in range(nn):
+                if int(float(HH_all[i])) == HH0:
+                    RR2[i] =1
+
+            data_use_final = data_use[RR2]
+            #print(data_use_final.shape)     
+            np.savetxt(PWV_SAR,data_use_final,fmt='%s', delimiter=',')  
+            os.remove(tt_all)
+            os.remove(tt_name)
+            
+    print('Done.')     
+    sys.exit(1)        
 
 if __name__ == '__main__':
     main(sys.argv[1:])
