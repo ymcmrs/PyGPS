@@ -152,7 +152,7 @@ INTRODUCTION = '''
 
 EXAMPLE = '''EXAMPLES:
 
-    extract_sar_atm_bash.py search_gps.txt imaging_time
+    extract_sar_atm_bash.py search_gps.txt imaging_time  [extract all of the data inside the default folder]
     extract_sar_atm_bash.py search_gps.txt imaging_time --date 20180101
     extract_sar_atm_bash.py search_gps.txt imaging_time --date_txt date_list.txt
 
