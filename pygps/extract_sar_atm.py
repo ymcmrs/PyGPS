@@ -159,7 +159,36 @@ def readdate(DATESTR):
             
     return DD
         
+
+def write_gps_h5(datasetDict, out_file, metadata=None, ref_file=None, compression=None):
+    #output = 'variogramStack.h5'
+    'lags                  1 x N '
+    'semivariance          M x N '
+    'sills                 M x 1 '
+    'ranges                M x 1 '
+    'nuggets               M x 1 '
+    
+    if os.path.isfile(out_file):
+        print('delete exsited file: {}'.format(out_file))
+        os.remove(out_file)
+
+    print('create HDF5 file: {} with w mode'.format(out_file))
+    dt = h5py.special_dtype(vlen=np.dtype('float64'))
+
+    
+    with h5py.File(out_file, 'w') as f:
+        for dsName in datasetDict.keys():
+            data = datasetDict[dsName]
+            ds = f.create_dataset(dsName,
+                              data=data,
+                              compression=compression)
         
+        for key, value in metadata.items():
+            f.attrs[key] = str(value)
+            #print(key + ': ' +  value)
+    print('finished writing to {}'.format(out_file))
+        
+    return out_file    
 ###################################################################################################
 
 INTRODUCTION = '''
@@ -375,6 +404,121 @@ def main(argv):
             os.remove(tt_all)
             os.remove(tt_name)
             
+################### generate gps_aps.h5 & gps_pwv.h5 ################################
+    PATH = gps_dir
+    data_list = glob.glob(PATH + '/SAR_GPS_Trop*')
+    date_list = [os.path.basename(x).split('_')[3] for x in glob.glob(PATH + '/SAR_GPS_Trop*')]
+    
+    N = len(date_list)
+    NN = 0
+    
+    N1 = np.zeros((N,))
+    for i in range(N):
+        #print(data_list[i])
+        GPS0 = np.loadtxt(data_list[i],delimiter=',', dtype = np.str)
+        y0= GPS0[:,0]
+        N0 = len(y0)
+        N1[i] = N0
+        if NN < N0:
+            NN = N0
+    
+    GPS_TD = np.zeros((N,NN),dtype=np.float32)
+    GPS_HD = np.zeros((N,NN),dtype=np.float32)
+    GPS_WD = np.zeros((N,NN),dtype=np.float32)
+    
+    date00 = np.zeros((N,NN)) #
+    GPS_NM = date00.astype(np.string_)
+    GPS_NM = np.asarray(GPS_NM, dtype='<S8')
+    
+    
+    for i in range(N):
+        GPS0 = np.loadtxt(data_list[i],delimiter=',', dtype = np.str)
+        n0 = len(GPS0[:,8])    
+        GPS_TD[i,0:n0] = np.asarray(GPS0[:,1],dtype = np.float32)
+        GPS_WD[i,0:n0] = np.asarray(GPS0[:,3],dtype = np.float32)
+        GPS_HD[i,0:n0] = np.asarray(GPS0[:,2],dtype = np.float32)
+        GPS_NM[i,0:n0] = GPS0[:,9]
+        
+    datasetDict =dict()
+    
+    datasetDict['gps_name'] = np.asarray(GPS[:,0],dtype = np.string_)
+    datasetDict['gps_height'] = np.asarray(GPS[:,3],dtype = np.float32)
+    datasetDict['gps_lat'] = np.asarray(GPS[:,1],dtype = np.float32)
+    datasetDict['gps_lon'] = np.asarray(GPS[:,2],dtype = np.float32)
+    
+    datasetDict['wzd'] = GPS_WD
+    datasetDict['hzd'] = GPS_HD
+    datasetDict['tzd'] = GPS_TD
+    datasetDict['date'] = np.asarray(date_list,dtype = np.string_)
+    datasetDict['station'] = GPS_NM
+
+    meta = {}
+    meta['UNIT'] = 'm'
+    meta['DATA_TYPE'] = 'aps'
+    
+    write_gps_h5(datasetDict, 'gps_aps.h5', metadata=meta, ref_file=None, compression=None)
+    
+#####################################################################
+    data_list = glob.glob(PATH + '/SAR_GPS_PWV*')
+    date_list = [os.path.basename(x).split('_')[3] for x in glob.glob(PATH + '/SAR_GPS_PWV*')]
+    
+    N = len(date_list)
+    NN = 0
+    
+    N1 = np.zeros((N,))
+    for i in range(N):
+        #print(data_list[i])
+        GPS0 = np.loadtxt(data_list[i],delimiter=',', dtype = np.str)
+        y0= GPS0[:,8]
+        N0 = len(y0)
+        N1[i] = N0
+        if NN < N0:
+            NN = N0
+    
+    GPS_PW = np.zeros((N,NN),dtype=np.float32)
+    GPS_TD = np.zeros((N,NN),dtype=np.float32)
+    GPS_HD = np.zeros((N,NN),dtype=np.float32)
+    GPS_WD = np.zeros((N,NN),dtype=np.float32)
+    
+    date00 = np.zeros((N,NN)) #
+    GPS_NM = date00.astype(np.string_)
+    GPS_NM = np.asarray(GPS_NM, dtype='<S8')
+    GPS_TE = np.zeros((N,NN),dtype=np.float32)
+    
+    for i in range(N):
+    
+        GPS0 = np.loadtxt(data_list[i],delimiter=',', dtype = np.str)
+        n0 = len(GPS0[:,8])
+        
+        GPS_PW[i,0:n0] = np.asarray(GPS0[:,8],dtype = np.float32)
+        GPS_TD[i,0:n0] = np.asarray(GPS0[:,5],dtype = np.float32)
+        GPS_WD[i,0:n0] = np.asarray(GPS0[:,6],dtype = np.float32)
+        GPS_HD[i,0:n0] = np.asarray(GPS0[:,12],dtype = np.float32)
+        GPS_NM[i,0:n0] = GPS0[:,17]
+        GPS_TE[i,0:n0] = np.asarray(GPS0[:,11],dtype = np.float32)
+        
+    datasetDict =dict()
+    
+    datasetDict['gps_name'] = np.asarray(GPS[:,0],dtype = np.string_)
+    datasetDict['gps_height'] = np.asarray(GPS[:,3],dtype = np.float32)
+    datasetDict['gps_lat'] = np.asarray(GPS[:,1],dtype = np.float32)
+    datasetDict['gps_lon'] = np.asarray(GPS[:,2],dtype = np.float32)
+    
+    datasetDict['pwv'] = GPS_PW
+    datasetDict['tem'] = GPS_TE
+    datasetDict['wzd'] = GPS_WD
+    datasetDict['hzd'] = GPS_HD
+    datasetDict['tzd'] = GPS_TD
+    datasetDict['date'] = np.asarray(date_list,dtype = np.string_)
+    datasetDict['station'] = GPS_NM
+    
+    meta = {}
+    meta['UNIT'] = 'mm'
+    meta['DATA_TYPE'] = 'pwv'
+    
+    write_gps_h5(datasetDict, 'gps_pwv.h5', metadata=meta, ref_file=None, compression=None)
+       
+    #########
     print('Done.')     
     sys.exit(1)        
 
