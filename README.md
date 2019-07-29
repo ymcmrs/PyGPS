@@ -9,14 +9,15 @@
 + Generate high-resolution atmospheric water vapor map by fusing InSAR and GPS measurement [not yet]
 
 
-Steps:
-
-(1) search_gps.py
-(2) download_gps_atm.py
-(3) extract_sar_atm.py
-(4) elevation_correlation.py
-(5) variogram_gps.py
-(6) gps_variogram_modeling.py
-(7) interp_sar_tropo.py
-(8) generate_timeseries_tropo.py
-(9) pygpsApp.py
+#### General Work-flow:
+ 
+    step1: search_gps.py                  [Done. Available]
+    step2: download_gps_atm.py            [Done. Available]
+    step3: extract_sar_atm.py             [Done. Available]
+    step4: elevation_correlation.py       [Done. open later]
+    step5: variogram_gps.py               [Done. open later]
+    step6: gps_variogram_modeling.py      [Done. open later]
+    step7: interp_sar_tropo.py            [Done. open later]
+    step8: generate_timeseries_tropo.py   [Done. open later]
+    
+    app: pygpsApp.py                      [Done. open later]
