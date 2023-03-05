@@ -14,10 +14,10 @@
     step1: search_gps.py                  [Done. Available]
     step2: download_gps_atm.py            [Done. Available]
     step3: extract_sar_atm.py             [Done. Available]
-    step4: elevation_correlation.py       [Done. open soon]
-    step5: variogram_gps.py               [Done. open soon]
-    step6: gps_variogram_modeling.py      [Done. open soon]
-    step7: interp_sar_tropo.py            [Done. open soon]
-    step8: generate_timeseries_tropo.py   [Done. open soon]
+    step4: elevation_correlation.py       
+    step5: variogram_gps.py               
+    step6: gps_variogram_modeling.py      
+    step7: interp_sar_tropo.py            
+    step8: generate_timeseries_tropo.py   
     
-    app: pygpsApp.py                      [Done. open soon]
+    app: pygpsApp.py                      
