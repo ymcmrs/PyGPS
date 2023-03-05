@@ -6,7 +6,7 @@
 + Download the GPS products of interest [yes]
 + Extract the spatio-temporal displacement and atmospheric products (time-series or near SAR epoch) [yes]
 + Mitigating the atmospheric effects for InSAR geodesy [not yet]
-+ Generate high-resolution atmospheric water vapor map by fusing InSAR and GPS measurement [not yet]
++ Generate high-resolution atmospheric water vapor map by fusing InSAR and GPS measurement [yes]
 
 
 #### General Work-flow:
